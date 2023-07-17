@@ -33,7 +33,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                //put your multiplatform dependencies here
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             }
         }
         val commonTest by getting {
