@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    AlarmList(listOf())
+                    AlarmList(sampleAlarms)
                 }
             }
         }
@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 fun DefaultPreview() {
     WTFUTheme {
