@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -141,7 +142,8 @@ private fun TimeRepeatCard(tempAlarm: Alarm, showRepeatDialog: () -> Unit, showT
 private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, onConfirm: (RepeatMode) -> Unit) {
     val days = if (repeatMode is RepeatMode.Custom) repeatMode.days else emptyList()
     val pair = DayOfWeek.values().map { it to days.contains(it) }
-    val map: MutableMap<DayOfWeek, Boolean> = remember { mutableStateMapOf(*pair.toTypedArray()) }
+    // just switch to list
+    val map= remember { mutableStateMapOf(*pair.toTypedArray()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -168,11 +170,12 @@ private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, on
             DayOfWeek.values().forEach { day ->
                 Row {
                     Checkbox(
-                        checked = map[day]!!,
-                        onCheckedChange = { map[day] = !it.also { Log.d("MRF", map.toString()) } })
+                        checked = map[day]!!, // TODO This doesnt work for some reason
+                        onCheckedChange = { map[day] = it })
                     Text(day.name, Modifier.align(Alignment.CenterVertically))
                 }
             }
+            Text(text = map.entries.joinToString { "${it.key} to ${it.value}" })
             Button(onClick = {
                 val selectedDays = map.mapNotNull { (key, value) -> if (value) key else null }
                 val repeat = when {
@@ -194,10 +197,12 @@ private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, on
                 }
                 onConfirm(repeat)
             }) {
-                Text("Done",
+                Text(
+                    "Done",
                     Modifier
                         .fillMaxWidth()
-                        .padding(5.dp), textAlign = TextAlign.Center)
+                        .padding(5.dp), textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -296,6 +301,27 @@ fun TimePickerViewDialog(
         timePicker.setOnDismissListener { onCancel() }
         onDispose {
             timePicker.cancel()
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StatemapTest() {
+    Surface {
+        val map: MutableMap<Int, Boolean> = remember {
+            mutableStateMapOf(
+                0 to true,
+                1 to false,
+                3 to true
+            )
+        }
+        Column {
+            Text(text = map.entries.joinToString { "${it.key} to ${it.value}" })
+            Text(text = "0 to ${map[0]}")
+            Button(onClick = { map[0] = false }) {
+                Text("Bump")
+            }
         }
     }
 }
