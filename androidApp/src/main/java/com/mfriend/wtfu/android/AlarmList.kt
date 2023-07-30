@@ -55,7 +55,7 @@ val sampleAlarms = listOf(
                 Alarm(4, 0, RepeatMode.Weekends, enabled = false),
                 Alarm(12, 10, RepeatMode.Weekdays),
                 Alarm(8, 8, RepeatMode.OneTime, enabled = false),
-                Alarm(10, 10, RepeatMode.Custom(listOf(DayOfWeek.MONDAY, DayOfWeek.THURSDAY)))
+                Alarm(10, 10, RepeatMode.Custom(setOf(DayOfWeek.MONDAY, DayOfWeek.THURSDAY)))
             )
 @Preview(showBackground = true, device = "id:pixel_6", uiMode = Configuration.UI_MODE_NIGHT_YES, widthDp = 300)
 //@Preview(showBackground = true, device = "id:pixel_6", uiMode = Configuration.UI_MODE_NIGHT_NO, widthDp = 300)

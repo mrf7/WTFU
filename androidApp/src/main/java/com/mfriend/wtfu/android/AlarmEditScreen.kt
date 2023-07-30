@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +60,15 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun AlarmEditScreen(alarm: Alarm? = null) {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    var tempAlarm by remember { mutableStateOf(alarm?.copy() ?: Alarm(time.hour, time.minute, RepeatMode.OneTime)) }
+    var tempAlarm by remember {
+        mutableStateOf(
+            alarm?.copy() ?: Alarm(
+                time.hour,
+                time.minute,
+                RepeatMode.OneTime
+            )
+        )
+    }
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -67,15 +77,19 @@ fun AlarmEditScreen(alarm: Alarm? = null) {
         var showRepeatMode by remember { mutableStateOf(false) }
         var showTimePicker by remember { mutableStateOf(false) }
         if (showTimePicker) {
-            TimePickerViewDialog(tempAlarm.hour, tempAlarm.minute, { showTimePicker = false }) { hour, minute ->
-                tempAlarm = tempAlarm.copy(hour, minute)
-                showTimePicker = false
-            }
+            TimePickerViewDialog(
+                initialHour = tempAlarm.hour,
+                initialMinute = tempAlarm.minute,
+                onCancel = { showTimePicker = false },
+                onConfirm = { hour, minute ->
+                    tempAlarm = tempAlarm.copy(hour, minute)
+                    showTimePicker = false
+                })
         }
         if (showRepeatMode) {
             RepeatPickerDialog(
                 repeatMode = tempAlarm.repeat,
-                onDismiss = { showTimePicker = false },
+                onDismiss = { showRepeatMode = false },
                 onConfirm = { tempAlarm = tempAlarm.copy(repeat = it) }
             )
         }
@@ -110,7 +124,11 @@ fun AlarmEditScreen(alarm: Alarm? = null) {
 }
 
 @Composable
-private fun TimeRepeatCard(tempAlarm: Alarm, showRepeatDialog: () -> Unit, showTimePicker: () -> Unit) {
+private fun TimeRepeatCard(
+    tempAlarm: Alarm,
+    showRepeatDialog: () -> Unit,
+    showTimePicker: () -> Unit
+) {
     Card(
         Modifier
             .fillMaxWidth()
@@ -139,11 +157,20 @@ private fun TimeRepeatCard(tempAlarm: Alarm, showRepeatDialog: () -> Unit, showT
 // TODO it doesnt work
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, onConfirm: (RepeatMode) -> Unit) {
+private fun RepeatPickerDialog(
+    repeatMode: RepeatMode,
+    onDismiss: () -> Unit,
+    onConfirm: (RepeatMode) -> Unit
+) {
     val days = if (repeatMode is RepeatMode.Custom) repeatMode.days else emptyList()
-    val pair = DayOfWeek.values().map { it to days.contains(it) }
     // just switch to list
-    val map= remember { mutableStateMapOf(*pair.toTypedArray()) }
+    val selected = remember {
+        mutableStateListOf<Boolean>().also { list ->
+            DayOfWeek.values().forEach {
+                list.add(days.contains(it))
+            }
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -158,44 +185,56 @@ private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, on
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                Card(border = BorderStroke(1.dp, Color.Black)) {
-                    Text("+Weekends", Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
-                }
-                Card(border = BorderStroke(1.dp, Color.Black)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Card(
+                    border = BorderStroke(1.dp, Color.Black),
+                    modifier = Modifier.clickable {
+                        RepeatMode.Weekdays.days.forEach {
+                            selected[it.ordinal] = true
+                        }
+                    }
+                ) {
                     Text("+Weekdays", Modifier.padding(5.dp))
                 }
+                Card(
+                    border = BorderStroke(1.dp, Color.Black),
+                    modifier = Modifier.clickable {
+                        RepeatMode.Weekends.days.forEach {
+                            selected[it.ordinal] = true
+                        }
+                    }
+                ) {
+                    Text("+Weekends", Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                }
             }
 
-            DayOfWeek.values().forEach { day ->
+            DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                 Row {
                     Checkbox(
-                        checked = map[day]!!, // TODO This doesnt work for some reason
-                        onCheckedChange = { map[day] = it })
-                    Text(day.name, Modifier.align(Alignment.CenterVertically))
+                        checked = selected[index], // TODO This doesnt work for some reason
+                        onCheckedChange = { selected[index] = it })
+                    // TODO why does this work but checkbox doesnt????
+                    Text(
+                        dayOfWeek.name,
+                        Modifier.align(Alignment.CenterVertically),
+                    )
                 }
             }
-            Text(text = map.entries.joinToString { "${it.key} to ${it.value}" })
             Button(onClick = {
-                val selectedDays = map.mapNotNull { (key, value) -> if (value) key else null }
+                val selectedDays =
+                    DayOfWeek.values().filterIndexed { index, _ -> selected[index] }.toSet()
                 val repeat = when {
-                    selectedDays.isEmpty() -> {
-                        RepeatMode.OneTime
-                    }
-
-                    selectedDays == RepeatMode.Weekdays.days -> {
-                        RepeatMode.Weekdays
-                    }
-
-                    selectedDays == RepeatMode.Weekends.days -> {
-                        RepeatMode.Weekends
-                    }
-
-                    else -> {
-                        RepeatMode.Custom(selectedDays)
-                    }
+                    selectedDays.isEmpty() -> RepeatMode.OneTime
+                    selectedDays == RepeatMode.Weekdays.days -> RepeatMode.Weekdays
+                    selectedDays == RepeatMode.Weekends.days -> RepeatMode.Weekends
+                    selectedDays == RepeatMode.EveryDay.days -> RepeatMode.EveryDay
+                    else -> RepeatMode.Custom(selectedDays)
                 }
                 onConfirm(repeat)
+                onDismiss()
             }) {
                 Text(
                     "Done",
@@ -212,7 +251,10 @@ private fun RepeatPickerDialog(repeatMode: RepeatMode, onDismiss: () -> Unit, on
 @Composable
 fun RepeatDialogPreview() {
     WTFUTheme {
-        RepeatPickerDialog(repeatMode = RepeatMode.OneTime, onDismiss = { /*TODO*/ }, onConfirm = {})
+        RepeatPickerDialog(
+            repeatMode = RepeatMode.Weekends,
+            onDismiss = { /*TODO*/ },
+            onConfirm = {})
     }
 }
 
@@ -238,7 +280,10 @@ private fun MissionsCard(
                             .height(80.dp)
                             .padding(10.dp)
                     ) {
-                        Column(Modifier.padding(5.dp), verticalArrangement = Arrangement.SpaceAround) {
+                        Column(
+                            Modifier.padding(5.dp),
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
                             Icon(Icons.Default.AccountBox, mission.name)
                             Text(text = mission.name)
                         }
@@ -254,7 +299,10 @@ private fun MissionsCard(
                             .padding(10.dp)
                             .clickable(onClick = addMission)
                     ) {
-                        Column(Modifier.padding(5.dp), verticalArrangement = Arrangement.SpaceAround) {
+                        Column(
+                            Modifier.padding(5.dp),
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
                             Icon(Icons.Default.AccountBox, "add")
                             Text(text = "Add Mission")
                         }
@@ -305,27 +353,6 @@ fun TimePickerViewDialog(
     }
 }
 
-@Preview
-@Composable
-fun StatemapTest() {
-    Surface {
-        val map: MutableMap<Int, Boolean> = remember {
-            mutableStateMapOf(
-                0 to true,
-                1 to false,
-                3 to true
-            )
-        }
-        Column {
-            Text(text = map.entries.joinToString { "${it.key} to ${it.value}" })
-            Text(text = "0 to ${map[0]}")
-            Button(onClick = { map[0] = false }) {
-                Text("Bump")
-            }
-        }
-    }
-}
-
 @Preview(device = "id:pixel_5", showSystemUi = true)
 @Composable
 fun AlarmEditScreenPreview() {
@@ -338,7 +365,11 @@ fun AlarmEditScreenPreview() {
 @Composable
 fun TimePickerPreview() {
     WTFUTheme {
-        TimePickerViewDialog(initialHour = 10, initialMinute = 30, onCancel = { /*TODO*/ }, onConfirm = { _, _ -> })
+        TimePickerViewDialog(
+            initialHour = 10,
+            initialMinute = 30,
+            onCancel = { /*TODO*/ },
+            onConfirm = { _, _ -> })
     }
 }
 

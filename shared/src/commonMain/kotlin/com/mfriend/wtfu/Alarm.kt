@@ -25,7 +25,7 @@ class MathMission : Mission {
 sealed interface RepeatMode {
     object OneTime : RepeatMode
     object Weekdays : Custom(
-        listOf(
+        setOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
@@ -33,16 +33,18 @@ sealed interface RepeatMode {
             DayOfWeek.FRIDAY
         )
     )
-    object Weekends : Custom(listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
-    open class Custom(val days: List<DayOfWeek>) : RepeatMode
+    object Weekends : Custom(setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
+    object EveryDay : Custom(DayOfWeek.values().toSet())
+    open class Custom(val days: Set<DayOfWeek>) : RepeatMode
 }
 
 fun RepeatMode.localizeString(): String {
     val repeatText = when (this) {
-        is RepeatMode.Custom -> this.days.joinToString { it.name.take(3) }
         RepeatMode.Weekdays -> "Weekdays"
         RepeatMode.Weekends -> "Weekends"
+        RepeatMode.EveryDay -> "Every Day"
         RepeatMode.OneTime -> "One Time"
+        is RepeatMode.Custom -> this.days.joinToString { it.name.take(3) }
     }
     return repeatText
 }
