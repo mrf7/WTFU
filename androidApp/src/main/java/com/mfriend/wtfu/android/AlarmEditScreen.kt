@@ -213,9 +213,8 @@ private fun RepeatPickerDialog(
             DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                 Row {
                     Checkbox(
-                        checked = selected[index], // TODO This doesnt work for some reason
+                        checked = selected[index],
                         onCheckedChange = { selected[index] = it })
-                    // TODO why does this work but checkbox doesnt????
                     Text(
                         dayOfWeek.name,
                         Modifier.align(Alignment.CenterVertically),
@@ -314,7 +313,6 @@ private fun SoundCard(sound: String, showSoundPicker: () -> Unit) {
 }
 
 
-
 @Composable
 fun TimePickerViewDialog(
     initialHour: Int,
@@ -350,7 +348,7 @@ fun TimePickerPreview() {
         TimePickerViewDialog(
             initialHour = 10,
             initialMinute = 30,
-            onCancel = { /*TODO*/ },
+            onCancel = {},
             onConfirm = { _, _ -> })
     }
 }
@@ -365,6 +363,7 @@ fun RepeatDialogPreview() {
             onConfirm = {})
     }
 }
+
 @Preview(device = "id:pixel_5")
 @Composable
 fun MissionsCardPreview() {
