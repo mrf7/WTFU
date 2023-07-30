@@ -154,7 +154,6 @@ private fun TimeRepeatCard(
     }
 }
 
-// TODO it doesnt work
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RepeatPickerDialog(
@@ -247,16 +246,6 @@ private fun RepeatPickerDialog(
     }
 }
 
-@Preview
-@Composable
-fun RepeatDialogPreview() {
-    WTFUTheme {
-        RepeatPickerDialog(
-            repeatMode = RepeatMode.Weekends,
-            onDismiss = { /*TODO*/ },
-            onConfirm = {})
-    }
-}
 
 @Composable
 private fun MissionsCard(
@@ -301,7 +290,7 @@ private fun MissionsCard(
                     ) {
                         Column(
                             Modifier.padding(5.dp),
-                            verticalArrangement = Arrangement.SpaceAround
+                            verticalArrangement = Arrangement.SpaceAround,
                         ) {
                             Icon(Icons.Default.AccountBox, "add")
                             Text(text = "Add Mission")
@@ -324,13 +313,6 @@ private fun SoundCard(sound: String, showSoundPicker: () -> Unit) {
     }
 }
 
-@Preview
-@Composable
-fun SoundCardPreview() {
-    WTFUTheme {
-        SoundCard(sound = "random", showSoundPicker = {})
-    }
-}
 
 
 @Composable
@@ -373,8 +355,26 @@ fun TimePickerPreview() {
     }
 }
 
+@Preview
+@Composable
+fun RepeatDialogPreview() {
+    WTFUTheme {
+        RepeatPickerDialog(
+            repeatMode = RepeatMode.Weekends,
+            onDismiss = {},
+            onConfirm = {})
+    }
+}
 @Preview(device = "id:pixel_5")
 @Composable
 fun MissionsCardPreview() {
     MissionsCard(missions = listOf(MathMission(), MathMission()), {}, {})
+}
+
+@Preview
+@Composable
+fun SoundCardPreview() {
+    WTFUTheme {
+        SoundCard(sound = "random", showSoundPicker = {})
+    }
 }
