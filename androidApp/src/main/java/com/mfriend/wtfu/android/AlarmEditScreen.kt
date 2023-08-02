@@ -1,13 +1,11 @@
 package com.mfriend.wtfu.android
 
 import android.app.TimePickerDialog
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,17 +26,16 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.MathMission
 import com.mfriend.wtfu.Mission
@@ -58,7 +56,22 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
-fun AlarmEditScreen(alarm: Alarm? = null) {
+fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = viewModel(), alarmSaved: () -> Unit) {
+    val alarm = viewModel.getAlarm(alarmId)
+    Scaffold { padding ->
+        AlarmEdit(alarm, Modifier.padding(padding)) {
+            viewModel.addAlarm(it)
+            alarmSaved()
+        }
+    }
+}
+
+@Composable
+private fun AlarmEdit(
+    alarm: Alarm? = null,
+    modifier: Modifier = Modifier,
+    addAlarm: (Alarm) -> Unit
+) {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     var tempAlarm by remember {
         mutableStateOf(
@@ -70,7 +83,7 @@ fun AlarmEditScreen(alarm: Alarm? = null) {
         )
     }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
     ) {
@@ -119,6 +132,9 @@ fun AlarmEditScreen(alarm: Alarm? = null) {
 
         SoundCard(tempAlarm.sound) { /**todo navigate**/ }
         Spacer(modifier = Modifier.height(10.dp))
+        Button(onClick = { addAlarm(tempAlarm) }) {
+            Text("Save")
+        }
 
     }
 }
@@ -337,7 +353,7 @@ fun TimePickerViewDialog(
 @Composable
 fun AlarmEditScreenPreview() {
     WTFUTheme {
-        AlarmEditScreen(alarm = null)
+        AlarmEdit(null, addAlarm = {})
     }
 }
 

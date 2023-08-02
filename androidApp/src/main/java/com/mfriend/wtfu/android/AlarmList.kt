@@ -24,7 +24,7 @@ import com.mfriend.wtfu.toTimeString
 import java.time.DayOfWeek
 
 @Composable
-fun AlarmList(alarms: List<Alarm>) {
+fun AlarmListScreen(alarms: List<Alarm>) {
     LazyColumn {
         items(alarms) {
             AlarmCard(alarm = it, Modifier.padding(horizontal = 5.dp, vertical = 5.dp))
@@ -62,7 +62,7 @@ val sampleAlarms = listOf(
 @Composable
 fun AlarmListPreview() {
     WTFUTheme {
-        AlarmList(
+        AlarmListScreen(
             alarms = sampleAlarms
         )
     }
