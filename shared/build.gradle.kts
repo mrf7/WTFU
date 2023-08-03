@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("com.android.library")
+    id("app.cash.sqldelight") version "2.0.0"
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -34,12 +35,25 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
+                api( "io.insert-koin:koin-core:3.4.1")
+
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
+        }
+        val androidMain by getting {
+            dependencies{
+                implementation("app.cash.sqldelight:android-driver:2.0.0")
+            }
+        }
+        val iosMain by getting {
+           dependencies{
+               implementation("app.cash.sqldelight:native-driver:2.0.0")
+           }
         }
     }
 }
@@ -49,5 +63,12 @@ android {
     compileSdk = 33
     defaultConfig {
         minSdk = 29
+    }
+}
+sqldelight{
+    databases{
+        create("AlarmDb"){
+            packageName.set("com.mfriend")
+        }
     }
 }

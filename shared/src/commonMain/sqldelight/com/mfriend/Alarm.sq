@@ -1,0 +1,15 @@
+import kotlin.Boolean;
+
+CREATE TABLE AlarmDbo(
+    id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
+    hour INTEGER NOT NULL,
+    minute INTEGER NOT NULL,
+    enabled INTEGER AS Boolean NOT NULL,
+    sound TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM AlarmDbo;
+
+insertAlarmDbo:
+REPLACE INTO AlarmDbo (id, hour, minute, enabled, sound) VALUES ?;

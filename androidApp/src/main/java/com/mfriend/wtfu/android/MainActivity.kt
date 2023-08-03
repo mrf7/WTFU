@@ -8,8 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mfriend.wtfu.Alarm
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +28,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AlarmApp(viewModel: AlarmViewModel = viewModel()) {
+fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
     WTFUTheme {
         val navController = rememberNavController()
         Scaffold(
@@ -68,5 +66,5 @@ fun AlarmApp(viewModel: AlarmViewModel = viewModel()) {
 @Preview(showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    AlarmApp()
+    AlarmApplication()
 }

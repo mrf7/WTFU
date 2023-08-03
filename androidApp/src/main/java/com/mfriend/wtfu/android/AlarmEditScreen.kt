@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.MathMission
 import com.mfriend.wtfu.Mission
@@ -54,23 +53,24 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = viewModel(), alarmSaved: () -> Unit) {
+fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
     val alarm = viewModel.getAlarm(alarmId)
     Scaffold { padding ->
-        AlarmEdit(alarm, Modifier.padding(padding)) {
+        AlarmEdit(alarm, {
             viewModel.addAlarm(it)
             alarmSaved()
-        }
+        }, Modifier.padding(padding))
     }
 }
 
 @Composable
 private fun AlarmEdit(
     alarm: Alarm? = null,
-    modifier: Modifier = Modifier,
-    addAlarm: (Alarm) -> Unit
+    addAlarm: (Alarm) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     var tempAlarm by remember {
