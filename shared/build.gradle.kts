@@ -30,14 +30,14 @@ kotlin {
             baseName = "shared"
         }
     }
-    
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
-                api( "io.insert-koin:koin-core:3.4.1")
-
+                api("io.insert-koin:koin-core:3.4.1")
+                implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
             }
         }
         val commonTest by getting {
@@ -46,14 +46,14 @@ kotlin {
             }
         }
         val androidMain by getting {
-            dependencies{
+            dependencies {
                 implementation("app.cash.sqldelight:android-driver:2.0.0")
             }
         }
         val iosMain by getting {
-           dependencies{
-               implementation("app.cash.sqldelight:native-driver:2.0.0")
-           }
+            dependencies {
+                implementation("app.cash.sqldelight:native-driver:2.0.0")
+            }
         }
     }
 }
@@ -65,9 +65,9 @@ android {
         minSdk = 29
     }
 }
-sqldelight{
-    databases{
-        create("AlarmDb"){
+sqldelight {
+    databases {
+        create("AlarmDb") {
             packageName.set("com.mfriend")
         }
     }

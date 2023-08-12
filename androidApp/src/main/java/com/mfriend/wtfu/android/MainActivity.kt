@@ -4,13 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,21 +35,27 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
     WTFUTheme {
         val navController = rememberNavController()
         Scaffold(
-            backgroundColor = MaterialTheme.colors.primarySurface,
             floatingActionButton = {
                 FloatingActionButton(onClick = { navController.navigate("AlarmEdit") }) {
                     Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add Alarm")
                 }
             }
         ) { padding ->
+            val alarms by viewModel.alarmsFlow.collectAsState(initial = emptyList())
             NavHost(
                 navController = navController,
                 startDestination = "AlarmList",
                 Modifier.padding(padding)
             ) {
-                composable("AlarmList") { AlarmListScreen(alarms = viewModel.alarms) }
+                composable("AlarmList") {
+                    AlarmListScreen(alarms = alarms) {
+                        navController.navigate(
+                            "AlarmEdit?alarm=${it.id}"
+                        )
+                    }
+                }
                 composable(
-                    "AlarmEdit?alarm",
+                    "AlarmEdit?alarm={alarm}",
                     arguments = listOf(navArgument("alarm") {
                         type = NavType.IntType
                         defaultValue = -1

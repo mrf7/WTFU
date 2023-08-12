@@ -6,6 +6,7 @@ data class Alarm(
     val hour: Int,
     val minute: Int,
     val repeat: RepeatMode,
+    val id: Int? = null,
     val snooze: Int? = null,
     val enabled: Boolean = true,
     val missions: List<Mission> = emptyList(),
@@ -33,6 +34,7 @@ sealed interface RepeatMode {
             DayOfWeek.FRIDAY
         )
     )
+
     object Weekends : Custom(setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
     object EveryDay : Custom(DayOfWeek.values().toSet())
     open class Custom(val days: Set<DayOfWeek>) : RepeatMode

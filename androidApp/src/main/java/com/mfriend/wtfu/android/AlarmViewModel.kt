@@ -1,23 +1,34 @@
 package com.mfriend.wtfu.android
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.mfriend.AlarmDb
+import androidx.lifecycle.viewModelScope
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.DatabaseHelper
+import com.mfriend.wtfu.RepeatMode
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
-class AlarmViewModel(val database: DatabaseHelper) : ViewModel() {
-    val alarms = mutableStateListOf<Alarm>(sampleAlarms.first())
-
-    fun getAlarm(id: Int) = alarms.getOrNull(id)
-
-    fun addAlarm(alarm: Alarm) {
-        alarms.add(alarm)
-        Log.d("Mrf", "Added alarm: ${alarms.joinToString()}")
+class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
+    val alarmsFlow = database.getAlarms().map { alarms ->
+        alarms.map {
+            Alarm(
+                hour = it.hour,
+                minute = it.minute,
+                repeat = RepeatMode.OneTime,
+                enabled = it.enabled,
+                sound = it.sound,
+                id = it.id
+            )
+        }
     }
 
-    fun updateAlarm(id: Int, alarm: Alarm) {
-        alarms[id] = alarm
+    fun getAlarm(id: Int) = database.getAlarm(id)
+
+    fun deleteAlarm(id: Long) {
+
+    }
+
+    fun saveAlarm(alarm: Alarm) {
+        viewModelScope.launch { database.insertAlam(alarm) }
     }
 }

@@ -1,41 +1,12 @@
 package com.mfriend.wtfu.android
 
 import android.app.TimePickerDialog
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme.shapes
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,12 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mfriend.wtfu.Alarm
-import com.mfriend.wtfu.MathMission
-import com.mfriend.wtfu.Mission
-import com.mfriend.wtfu.RepeatMode
-import com.mfriend.wtfu.localizeString
-import com.mfriend.wtfu.toTimeString
+import com.mfriend.wtfu.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
@@ -59,18 +25,18 @@ import org.koin.androidx.compose.koinViewModel
 fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
     val alarm = viewModel.getAlarm(alarmId)
     Scaffold { padding ->
-        AlarmEdit(alarm, {
-            viewModel.addAlarm(it)
+        AlarmEdit(Modifier.padding(padding), alarm) {
+            viewModel.saveAlarm(it)
             alarmSaved()
-        }, Modifier.padding(padding))
+        }
     }
 }
 
 @Composable
 private fun AlarmEdit(
+    modifier: Modifier = Modifier,
     alarm: Alarm? = null,
-    addAlarm: (Alarm) -> Unit,
-    modifier: Modifier = Modifier
+    addAlarm: (Alarm) -> Unit
 ) {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     var tempAlarm by remember {
@@ -278,7 +244,7 @@ private fun MissionsCard(
                 for (mission in missions) {
                     Surface(
                         color = MaterialTheme.colorScheme.onSecondary,
-                        shape = shapes.medium,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier
                             .width(150.dp)
                             .height(80.dp)
@@ -296,7 +262,7 @@ private fun MissionsCard(
                 if (missions.size < 3) {
                     Surface(
                         color = MaterialTheme.colorScheme.onSecondary,
-                        shape = shapes.medium,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier
                             .width(150.dp)
                             .height(80.dp)
@@ -353,7 +319,7 @@ fun TimePickerViewDialog(
 @Composable
 fun AlarmEditScreenPreview() {
     WTFUTheme {
-        AlarmEdit(null, addAlarm = {})
+        AlarmEdit(alarm = null) {}
     }
 }
 
