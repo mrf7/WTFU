@@ -44,9 +44,12 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
             val alarms by viewModel.alarmsFlow.collectAsState(initial = emptyList())
             NavHost(
                 navController = navController,
-                startDestination = "AlarmList",
+                startDestination = "Test",
                 Modifier.padding(padding)
             ) {
+                composable("TEST") {
+                    AlarmSetScreen()
+                }
                 composable("AlarmList") {
                     AlarmListScreen(alarms = alarms) {
                         navController.navigate(
