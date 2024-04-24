@@ -23,6 +23,11 @@ class MathMission : Mission {
     override val icon = 0
 }
 
+class NoMission : Mission {
+    override val icon: Int = 0
+    override val name: String = "None"
+}
+
 sealed interface RepeatMode {
     object OneTime : RepeatMode
     object Weekdays : Custom(

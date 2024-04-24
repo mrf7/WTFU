@@ -1,6 +1,5 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,13 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.RepeatMode
 import com.mfriend.wtfu.localizeString
 import com.mfriend.wtfu.toTimeString
-import java.time.DayOfWeek
+import kotlinx.datetime.DayOfWeek
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AlarmListScreen(alarms: List<Alarm>, onAlarmClicked: (Alarm) -> Unit) {
@@ -59,8 +58,9 @@ val sampleAlarms = listOf(
     Alarm(10, 10, RepeatMode.Custom(setOf(DayOfWeek.MONDAY, DayOfWeek.THURSDAY)))
 )
 
-@Preview(showBackground = true, device = "id:pixel_6", uiMode = Configuration.UI_MODE_NIGHT_YES, widthDp = 300)
+//@Preview(showBackground = true, device = "id:pixel_6", uiMode = Configuration.UI_MODE_NIGHT_YES, widthDp = 300)
 //@Preview(showBackground = true, device = "id:pixel_6", uiMode = Configuration.UI_MODE_NIGHT_NO, widthDp = 300)
+@Preview
 @Composable
 fun AlarmListPreview() {
     WTFUTheme {

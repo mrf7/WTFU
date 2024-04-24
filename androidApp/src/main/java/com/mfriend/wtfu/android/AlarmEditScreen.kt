@@ -15,12 +15,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfriend.wtfu.*
+import com.mfriend.wtfu.ui.WTFUTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 
+// TODO Commonize view model and timepicker dialog to move into shared
 @Composable
 fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
     val alarm = viewModel.getAlarm(alarmId)

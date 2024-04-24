@@ -3,6 +3,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("app.cash.sqldelight") version "2.0.0"
+    id("org.jetbrains.compose")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -34,10 +35,17 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
                 implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
                 api("io.insert-koin:koin-core:3.4.1")
                 implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.material3)
+                implementation(compose.components.uiToolingPreview)
             }
         }
         val commonTest by getting {
