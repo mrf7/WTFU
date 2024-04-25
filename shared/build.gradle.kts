@@ -39,6 +39,7 @@ kotlin {
                 implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
                 api("io.insert-koin:koin-core:3.4.1")
                 implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -56,6 +57,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("app.cash.sqldelight:android-driver:2.0.0")
+                implementation("androidx.activity:activity-compose:1.7.2")
             }
         }
         val iosMain by getting {

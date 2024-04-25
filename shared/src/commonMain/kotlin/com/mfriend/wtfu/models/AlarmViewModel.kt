@@ -1,12 +1,9 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu.models
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.DatabaseHelper
 import com.mfriend.wtfu.RepeatMode
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
     val alarmsFlow = database.getAlarms().map { alarms ->
@@ -29,6 +26,6 @@ class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
     }
 
     fun saveAlarm(alarm: Alarm) {
-        viewModelScope.launch { database.insertAlam(alarm) }
+//        viewModelScope.launch { database.insertAlam(alarm) }
     }
 }
