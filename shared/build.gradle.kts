@@ -36,13 +36,12 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-                implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
-                api("io.insert-koin:koin-core:3.4.1")
+                implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
+                api("io.insert-koin:koin-core:3.5.3")
                 implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.material3)

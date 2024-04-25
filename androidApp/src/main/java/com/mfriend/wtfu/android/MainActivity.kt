@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mfriend.wtfu.models.AlarmViewModel
+import com.mfriend.wtfu.ui.AlarmEditScreen
 import com.mfriend.wtfu.ui.AlarmListScreen
 import com.mfriend.wtfu.ui.WTFUTheme
 import org.koin.androidx.compose.koinViewModel

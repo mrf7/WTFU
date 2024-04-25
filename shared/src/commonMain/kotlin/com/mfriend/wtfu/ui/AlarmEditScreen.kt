@@ -1,6 +1,5 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu.ui
 
-import android.app.TimePickerDialog
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,22 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfriend.wtfu.*
 import com.mfriend.wtfu.models.AlarmViewModel
-import com.mfriend.wtfu.ui.WTFUTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
-// TODO Commonize view model and timepicker dialog to move into shared
+// TODO Commonize timepicker dialog to move into shared
 @Composable
-fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
+fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel, alarmSaved: () -> Unit) {
     val alarm = viewModel.getAlarm(alarmId)
     Scaffold { padding ->
         AlarmEdit(Modifier.padding(padding), alarm) {
@@ -59,14 +55,14 @@ private fun AlarmEdit(
         var showRepeatMode by remember { mutableStateOf(false) }
         var showTimePicker by remember { mutableStateOf(false) }
         if (showTimePicker) {
-            TimePickerViewDialog(
-                initialHour = tempAlarm.hour,
-                initialMinute = tempAlarm.minute,
-                onCancel = { showTimePicker = false },
-                onConfirm = { hour, minute ->
-                    tempAlarm = tempAlarm.copy(hour, minute)
-                    showTimePicker = false
-                })
+//            TimePickerViewDialog(
+//                initialHour = tempAlarm.hour,
+//                initialMinute = tempAlarm.minute,
+//                onCancel = { showTimePicker = false },
+//                onConfirm = { hour, minute ->
+//                    tempAlarm = tempAlarm.copy(hour, minute)
+//                    showTimePicker = false
+//                })
         }
         if (showRepeatMode) {
             RepeatPickerDialog(
@@ -99,6 +95,7 @@ private fun AlarmEdit(
         MissionsCard(missions = tempAlarm.missions, onNewMissions = {}, addMission = {})
         Spacer(modifier = Modifier.height(10.dp))
 
+        /**todo navigate**/
         SoundCard(tempAlarm.sound) { /**todo navigate**/ }
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = { addAlarm(tempAlarm) }) {
@@ -298,27 +295,27 @@ private fun SoundCard(sound: String, showSoundPicker: () -> Unit) {
 }
 
 
-@Composable
-fun TimePickerViewDialog(
-    initialHour: Int,
-    initialMinute: Int,
-    onCancel: () -> Unit,
-    onConfirm: (hour: Int, minute: Int) -> Unit
-) {
-    val context = LocalContext.current
-    val timePicker = TimePickerDialog(context, { _, selectedHour: Int, selectedMinute: Int ->
-        onConfirm(selectedHour, selectedMinute)
-    }, initialHour, initialMinute, false)
-    DisposableEffect(true) {
-        timePicker.show()
-        timePicker.setOnDismissListener { onCancel() }
-        onDispose {
-            timePicker.cancel()
-        }
-    }
-}
+//@Composable
+//fun TimePickerViewDialog(
+//    initialHour: Int,
+//    initialMinute: Int,
+//    onCancel: () -> Unit,
+//    onConfirm: (hour: Int, minute: Int) -> Unit
+//) {
+//    val context = LocalContext.current
+//    val timePicker = TimePickerDialog(context, { _, selectedHour: Int, selectedMinute: Int ->
+//        onConfirm(selectedHour, selectedMinute)
+//    }, initialHour, initialMinute, false)
+//    DisposableEffect(true) {
+//        timePicker.show()
+//        timePicker.setOnDismissListener { onCancel() }
+//        onDispose {
+//            timePicker.cancel()
+//        }
+//    }
+//}
 
-@Preview(device = "id:pixel_5", showSystemUi = true)
+//@Preview(device = "id:pixel_5", showSystemUi = true)
 @Composable
 fun AlarmEditScreenPreview() {
     WTFUTheme {
@@ -330,11 +327,11 @@ fun AlarmEditScreenPreview() {
 @Composable
 fun TimePickerPreview() {
     WTFUTheme {
-        TimePickerViewDialog(
-            initialHour = 10,
-            initialMinute = 30,
-            onCancel = {},
-            onConfirm = { _, _ -> })
+//        TimePickerViewDialog(
+//            initialHour = 10,
+//            initialMinute = 30,
+//            onCancel = {},
+//            onConfirm = { _, _ -> })
     }
 }
 
@@ -349,7 +346,8 @@ fun RepeatDialogPreview() {
     }
 }
 
-@Preview(device = "id:pixel_5")
+//@Preview(device = "id:pixel_5")
+@Preview
 @Composable
 fun MissionsCardPreview() {
     MissionsCard(missions = listOf(MathMission(), MathMission()), {}, {})
