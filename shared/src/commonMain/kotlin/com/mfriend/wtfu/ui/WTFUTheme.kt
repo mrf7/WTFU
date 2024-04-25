@@ -2,7 +2,10 @@ package com.mfriend.wtfu.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -17,20 +20,20 @@ fun WTFUTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
-        darkColors(
+        darkColorScheme(
             primary = Color(0xFFBB86FC),
-            primaryVariant = Color(0xFF3700B3),
+//            primaryVariant = Color(0xFF3700B3),
             secondary = Color(0xFF03DAC5)
         )
     } else {
-        lightColors(
+        darkColorScheme(
             primary = Color(0xFF6200EE),
-            primaryVariant = Color(0xFF3700B3),
+//            primaryVariant = Color(0xFF3700B3),
             secondary = Color(0xFF03DAC5)
         )
     }
     val typography = Typography(
-        body1 = TextStyle(
+        bodyLarge = TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp
@@ -43,7 +46,7 @@ fun WTFUTheme(
     )
 
     MaterialTheme(
-        colors = colors,
+        colorScheme = colors,
         typography = typography,
         shapes = shapes,
         content = content
