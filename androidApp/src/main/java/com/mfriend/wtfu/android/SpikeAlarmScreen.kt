@@ -10,7 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import java.time.ZoneId
+import kotlinx.datetime.Clock
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun AlarmSetScreen() {
@@ -19,15 +20,17 @@ fun AlarmSetScreen() {
         Button(onClick = {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
                 ?: throw RuntimeException("Couldnt get alarm")
-            val intent = Intent(context, MainActivity::class.java).let {
-                it.setAction(Intent.ACTION_MAIN)
-                it.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                PendingIntent.getActivity(context, 1, it, PendingIntent.FLAG_IMMUTABLE)
-            }
+            val intent = Intent(context, AlarmReceiver::class.java).apply { putExtra("ID", 0) }
+            val time = Clock.System.now().plus(15.seconds).epochSeconds
             alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP, java.time.LocalDateTime.now().plusSeconds(30).atZone(
-                    ZoneId.systemDefault()
-                ).toEpochSecond(), intent
+                AlarmManager.RTC_WAKEUP,
+                time,
+                PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             )
         }) {
             Text("Set Alarm")
@@ -38,5 +41,5 @@ fun AlarmSetScreen() {
 @Preview
 @Composable
 fun AlarmSetPreview() {
-
+    AlarmSetScreen()
 }
