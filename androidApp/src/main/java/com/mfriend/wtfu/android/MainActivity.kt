@@ -1,5 +1,7 @@
 package com.mfriend.wtfu.android
 
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +25,11 @@ import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        setShowWhenLocked(true)
+        setTurnScreenOn(true)
+        val notificationManager: NotificationManager =
+            this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(3)
         super.onCreate(savedInstanceState)
         setContent {
             AlarmApp()
