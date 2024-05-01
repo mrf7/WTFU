@@ -1,7 +1,6 @@
 package com.mfriend.wtfu.android
 
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,14 +20,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
+    private val notificationManager: NotificationManager by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
-        val notificationManager: NotificationManager =
-            this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(3)
         super.onCreate(savedInstanceState)
         setContent {

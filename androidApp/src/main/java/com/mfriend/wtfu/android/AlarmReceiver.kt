@@ -30,7 +30,7 @@ class AlarmReceiver : BroadcastReceiver() {
         )
 
         val builder = NotificationCompat.Builder(context, "ID")
-            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("My notification")
             .setContentText("Hello World!")
             .setAutoCancel(true)
@@ -46,13 +46,6 @@ class AlarmReceiver : BroadcastReceiver() {
                     Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 Log.d("MRF", "No perms")
                 return
             }
