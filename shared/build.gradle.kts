@@ -34,7 +34,7 @@ kotlin {
         commonMain {
             dependencies {
                 api("androidx.lifecycle:lifecycle-viewmodel:2.8.0-rc01")
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
                 implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
                 api("io.insert-koin:koin-core:3.4.1")
                 implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
