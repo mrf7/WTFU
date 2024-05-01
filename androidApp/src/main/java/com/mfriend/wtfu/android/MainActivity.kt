@@ -53,9 +53,6 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                 startDestination = "Test",
                 Modifier.padding(padding)
             ) {
-                composable("TEST") {
-                    AlarmSetScreen()
-                }
                 composable("AlarmList") {
                     AlarmListScreen(alarms = alarms) {
                         navController.navigate(
