@@ -1,5 +1,6 @@
 package com.mfriend.wtfu.android
 
+import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,10 +20,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
+    private val notificationManager: NotificationManager by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
+        setShowWhenLocked(true)
+        setTurnScreenOn(true)
+        notificationManager.cancel(3)
         super.onCreate(savedInstanceState)
         setContent {
             AlarmApp()
@@ -44,9 +50,12 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
             val alarms by viewModel.alarmsFlow.collectAsState(initial = emptyList())
             NavHost(
                 navController = navController,
-                startDestination = "AlarmList",
+                startDestination = "Test",
                 Modifier.padding(padding)
             ) {
+                composable("TEST") {
+                    AlarmSetScreen()
+                }
                 composable("AlarmList") {
                     AlarmListScreen(alarms = alarms) {
                         navController.navigate(
