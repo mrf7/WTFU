@@ -1,10 +1,8 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mfriend.wtfu.Alarm
-import com.mfriend.wtfu.DatabaseHelper
-import com.mfriend.wtfu.RepeatMode
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -22,10 +20,14 @@ class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
         }
     }
 
-    fun getAlarm(id: Int) = database.getAlarm(id)
+    fun getAlarm(id: Int): Flow<Alarm?> {
+        return database.getAlarm(id).map { it?.toAlarm() }
+    }
 
-    fun deleteAlarm(id: Long) {
-
+    fun deleteAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            database.deleteAlarm(alarm)
+        }
     }
 
     fun saveAlarm(alarm: Alarm) {

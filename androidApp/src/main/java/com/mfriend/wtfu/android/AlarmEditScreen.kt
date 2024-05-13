@@ -23,7 +23,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
-    val alarm = viewModel.getAlarm(alarmId)
+    val alarm by viewModel.getAlarm(alarmId).collectAsState(null)
     Scaffold { padding ->
         AlarmEdit(Modifier.padding(padding), alarm) {
             viewModel.saveAlarm(it)

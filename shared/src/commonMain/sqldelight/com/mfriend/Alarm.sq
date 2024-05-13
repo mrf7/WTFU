@@ -17,3 +17,9 @@ REPLACE INTO AlarmDbo (id, hour, minute, enabled, sound) VALUES (?, ?, ?, ?, ?);
 
 selectById:
 SELECT * FROM AlarmDbo WHERE id = ?;
+
+delete:
+DELETE FROM AlarmDbo WHERE id = ?;
+
+deleteAll:
+DELETE FROM AlarmDbo;
