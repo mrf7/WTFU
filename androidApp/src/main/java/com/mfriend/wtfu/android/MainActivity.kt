@@ -4,22 +4,17 @@ import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mfriend.wtfu.AlarmViewModel
+import com.mfriend.wtfu.android.ui.alarm.AlarmTrigger
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,25 +35,24 @@ class MainActivity : ComponentActivity() {
 fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
     WTFUTheme {
         val navController = rememberNavController()
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(onClick = { navController.navigate("AlarmEdit") }) {
-                    Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add Alarm")
-                }
-            }
-        ) { padding ->
+        Surface {
             val alarms by viewModel.alarmsFlow.collectAsState(initial = emptyList())
             NavHost(
                 navController = navController,
                 startDestination = "AlarmList",
-                Modifier.padding(padding)
             ) {
+                composable("AlarmTrigger") {
+                    AlarmTrigger()
+                }
                 composable("AlarmList") {
-                    AlarmListScreen(alarms = alarms) {
-                        navController.navigate(
-                            "AlarmEdit?alarm=${it.id}"
-                        )
-                    }
+                    AlarmListScreen(
+                        alarms = alarms,
+                        newAlarm = { navController.navigate("AlarmEdit") },
+                        onAlarmClicked = {
+                            navController.navigate(
+                                "AlarmEdit?alarm=${it.id}"
+                            )
+                        })
                 }
                 composable(
                     "AlarmEdit?alarm={alarm}",
