@@ -138,7 +138,7 @@ private fun AlarmTriggerPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun DateTimeHeaderPreview() {
+fun DateTimeHeaderPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             DateTimeHeader()
