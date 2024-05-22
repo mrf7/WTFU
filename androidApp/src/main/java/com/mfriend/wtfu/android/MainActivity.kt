@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mfriend.wtfu.AlarmViewModel
-import com.mfriend.wtfu.android.ui.alarm.AlarmTrigger
+import com.mfriend.wtfu.android.ui.alarm.AlarmTriggerScreen
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,8 +41,10 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                 navController = navController,
                 startDestination = "AlarmList",
             ) {
-                composable("AlarmTrigger") {
-                    AlarmTrigger()
+                composable("AlarmTrigger?alarm={alarm}", arguments = listOf(navArgument("alarm") {
+                    type= NavType.ReferenceType
+                })) { backstackEntry ->
+                    AlarmTriggerScreen(backstackEntry.arguments!!.getInt("alarm"),viewModel)
                 }
                 composable("AlarmList") {
                     AlarmListScreen(
@@ -50,7 +52,7 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                         newAlarm = { navController.navigate("AlarmEdit") },
                         onAlarmClicked = {
                             navController.navigate(
-                                "AlarmEdit?alarm=${it.id}"
+                                "AlarmTrigger?alarm=${it.id}"
                             )
                         })
                 }
