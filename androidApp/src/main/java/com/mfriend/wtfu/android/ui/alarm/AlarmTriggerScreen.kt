@@ -1,15 +1,23 @@
 package com.mfriend.wtfu.android.ui.alarm
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,8 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mfriend.wtfu.Alarm
+import com.mfriend.wtfu.AlarmViewModel
+import com.mfriend.wtfu.MathMission
+import com.mfriend.wtfu.RepeatMode
 import com.mfriend.wtfu.android.WTFUTheme
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
@@ -39,10 +53,109 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun AlarmTrigger() {
+fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmViewModel) {
+    val alarm by viewModel.getAlarm(alarmId).collectAsStateWithLifecycle(initialValue = null)
+    AlarmScreenInner(alarm)
+}
+
+@Composable
+private fun AlarmScreenInner(alarm: Alarm?) {
+    var dismiss by remember { mutableStateOf(false) }
+    if (dismiss) {
+        AlarmDismiss(alarm) { dismiss = false }
+    } else {
+        AlarmTrigger { dismiss = true }
+    }
+}
+
+@Composable
+private fun AlarmDismiss(alarm: Alarm?, onDismiss: () -> Unit) {
+    when (alarm?.missions?.firstOrNull()) {
+        is MathMission -> MathMissionScreen(onDismiss = onDismiss)
+        null -> TODO()
+    }
+}
+
+@Composable
+private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) {
+    var answerText by remember { mutableStateOf("") }
+
+    val numbers = remember {
+        Pair(Random.nextInt(10, 100), Random.nextInt(10, 100))
+    }
+
+    fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second
+    Column() {
+        Text(
+            "${numbers.first} + ${numbers.second} = ",
+            Modifier.align(Alignment.CenterHorizontally),
+            style = MaterialTheme.typography.headlineLarge
+        )
+        Text(
+            answerText,
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(horizontal = 50.dp)
+                .border(1.dp, Color.Black)
+                .sizeIn(200.dp),
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.End
+        )
+        (9 downTo 1).chunked(3).forEach { rowNums ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                rowNums.reversed().forEach {
+                    Button(
+                        onClick = { answerText += it.toString() },
+                        Modifier
+                            .weight(1f)
+                            .padding(5.dp),
+                        shape = RoundedCornerShape(5)
+                    ) {
+                        Text(it.toString())
+                    }
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Button(
+                onClick = { answerText = answerText.dropLast(1) },
+                Modifier
+                    .weight(1f)
+                    .padding(5.dp),
+                shape = RoundedCornerShape(5)
+            ) {
+                Icon(Icons.Default.ArrowBack, "Back")
+            }
+
+            Button(
+                onClick = { answerText += 0.toString() },
+                Modifier
+                    .weight(1f)
+                    .padding(5.dp),
+                shape = RoundedCornerShape(5)
+            ) {
+                Text("0")
+            }
+
+            Button(
+                onClick = { if (checkAnswer()) onDismiss() },
+                Modifier
+                    .weight(1f)
+                    .padding(5.dp),
+                shape = RoundedCornerShape(5)
+            ) {
+                Icon(Icons.Default.Check, "Done")
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlarmTrigger(onDismiss: () -> Unit) {
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -51,7 +164,7 @@ fun AlarmTrigger() {
         DateTimeHeader(Modifier.padding(vertical = 20.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Button(
-                onClick = {/*TODO*/ },
+                onClick = { /*TODO*/ },
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
@@ -60,10 +173,10 @@ fun AlarmTrigger() {
             }
             Spacer(Modifier.height(10.dp))
             Button(
-                onClick = {/*TODO*/ },
+                onClick = onDismiss,
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
                 colors = ButtonDefaults.buttonColors(Color.Red)
             ) {
                 Text("Dismiss")
@@ -74,7 +187,6 @@ fun AlarmTrigger() {
 
 @Composable
 private fun DateTimeHeader(modifier: Modifier = Modifier) {
-
     var dateTime: LocalDateTime by remember {
         mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     }
@@ -128,21 +240,30 @@ private fun formatTime(date: LocalTime): String {
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
+fun MathMissionPreview() {
+    WTFUTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            MathMissionScreen {}
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
 private fun AlarmTriggerPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            AlarmTrigger()
+            AlarmTrigger {}
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun DateTimeHeaderPreview() {
+private fun AlarmScreenPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            DateTimeHeader()
+            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = listOf(MathMission())))
         }
     }
 }
-
