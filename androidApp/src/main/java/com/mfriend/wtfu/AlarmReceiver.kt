@@ -1,4 +1,4 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu
 
 import android.Manifest
 import android.app.Notification

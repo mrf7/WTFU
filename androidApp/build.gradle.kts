@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace = "com.mfriend.wtfu.android"
+    namespace = "com.mfriend.wtfu"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.mfriend.wtfu.android"
+        applicationId = "com.mfriend.wtfu"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
