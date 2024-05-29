@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
+class AlarmViewModel(private val database: DatabaseHelper, private val alarmScheduler: AlarmScheduler) : ViewModel() {
     val alarmsFlow = database.getAlarms().map { alarms ->
         alarms.map {
             Alarm(
@@ -32,5 +32,8 @@ class AlarmViewModel(private val database: DatabaseHelper) : ViewModel() {
 
     fun saveAlarm(alarm: Alarm) {
         viewModelScope.launch { database.insertAlam(alarm) }
+    }
+    fun scheduleAlarm(alarm: Alarm) {
+       alarmScheduler.scheduleNotification(alarm)
     }
 }

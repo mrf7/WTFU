@@ -1,11 +1,9 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu
 
 import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
-import com.mfriend.wtfu.AlarmScheduler
-import com.mfriend.wtfu.AlarmViewModel
 import com.mfriend.wtfu.di.initKoin
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module

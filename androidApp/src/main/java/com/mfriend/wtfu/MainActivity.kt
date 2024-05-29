@@ -1,4 +1,4 @@
-package com.mfriend.wtfu.android
+package com.mfriend.wtfu
 
 import android.app.NotificationManager
 import android.os.Bundle
@@ -13,8 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mfriend.wtfu.AlarmViewModel
-import com.mfriend.wtfu.android.ui.alarm.AlarmTriggerScreen
+import androidx.navigation.navDeepLink
+import com.mfriend.wtfu.ui.alarm.AlarmTriggerScreen
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,9 +41,13 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                 navController = navController,
                 startDestination = "AlarmList",
             ) {
-                composable("AlarmTrigger?alarm={alarm}", arguments = listOf(navArgument("alarm") {
-                    type= NavType.ReferenceType
-                })) { backstackEntry ->
+                composable(
+                    "AlarmTrigger?alarm={alarm}",
+                    arguments = listOf(navArgument("alarm") {
+                        type = NavType.ReferenceType
+                    }),
+                    deepLinks = listOf(navDeepLink { uriPattern = "https://mrfiend.com/{alarm}"})
+                ) { backstackEntry ->
                     AlarmTriggerScreen(backstackEntry.arguments!!.getInt("alarm"),viewModel)
                 }
                 composable("AlarmList") {
