@@ -127,9 +127,9 @@ private fun AlarmEdit(
         Spacer(modifier = Modifier.height(10.dp))
 
         MissionsCard(
-            missions = tempAlarm.missions,
+            mission = tempAlarm.missions,
             onNewMissions = {},
-            addMission = { tempAlarm = tempAlarm.copy(missions = listOf(MathMission())) })
+            addMission = { tempAlarm = tempAlarm.copy(missions = MathMission()) })
         Spacer(modifier = Modifier.height(10.dp))
 
         /**todo navigate**/
@@ -269,7 +269,7 @@ private fun RepeatPickerDialog(
 
 @Composable
 private fun MissionsCard(
-    missions: List<Mission>,
+    mission: Mission?,
     onNewMissions: (missions: List<Mission>) -> Unit,
     addMission: () -> Unit
 ) {
@@ -278,9 +278,8 @@ private fun MissionsCard(
             .fillMaxWidth()
     ) {
         Column(Modifier.padding(10.dp)) {
-            Text(text = "Mission ${missions.size}/3")
             Row(Modifier.horizontalScroll(rememberScrollState())) {
-                for (mission in missions) {
+                if (mission != null)
                     Surface(
                         color = MaterialTheme.colorScheme.onSecondary,
                         shape = MaterialTheme.shapes.medium,
@@ -297,24 +296,23 @@ private fun MissionsCard(
                             Text(text = mission.name)
                         }
                     }
-                }
-                if (missions.size < 3) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(80.dp)
-                            .padding(10.dp)
-                            .clickable(onClick = addMission)
+            }
+            if (mission == null) {
+                Surface(
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(80.dp)
+                        .padding(10.dp)
+                        .clickable(onClick = addMission)
+                ) {
+                    Column(
+                        Modifier.padding(5.dp),
+                        verticalArrangement = Arrangement.SpaceAround,
                     ) {
-                        Column(
-                            Modifier.padding(5.dp),
-                            verticalArrangement = Arrangement.SpaceAround,
-                        ) {
-                            Icon(Icons.Default.AccountBox, "add")
-                            Text(text = "Add Mission")
-                        }
+                        Icon(Icons.Default.AccountBox, "add")
+                        Text(text = "Add Mission")
                     }
                 }
             }
@@ -388,7 +386,7 @@ fun RepeatDialogPreview() {
 @Preview(device = "id:pixel_5")
 @Composable
 fun MissionsCardPreview() {
-    MissionsCard(missions = listOf(MathMission(), MathMission()), {}, {})
+    MissionsCard(mission = MathMission(), {}, {})
 }
 
 @Preview

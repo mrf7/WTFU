@@ -9,7 +9,7 @@ data class Alarm(
     val id: Int? = null,
     val snooze: Int? = null,
     val enabled: Boolean = true,
-    val missions: List<Mission> = emptyList(),
+    val missions: Mission? = null,
     val sound: String = "random"
 )
 

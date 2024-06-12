@@ -56,7 +56,7 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                         newAlarm = { navController.navigate("AlarmEdit") },
                         onAlarmClicked = {
                             navController.navigate(
-                                "AlarmTrigger?alarm=${it.id}"
+                                "AlarmEdit?alarm=${it.id}"
                             )
                         })
                 }

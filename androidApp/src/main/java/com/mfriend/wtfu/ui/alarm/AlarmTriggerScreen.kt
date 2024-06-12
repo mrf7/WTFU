@@ -264,7 +264,7 @@ private fun AlarmTriggerPreview() {
 private fun AlarmScreenPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = listOf(MathMission())))
+            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = MathMission()))
         }
     }
 }
