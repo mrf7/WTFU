@@ -48,4 +48,5 @@ dependencies {
     implementation(libs.compose.navigation)
     implementation(libs.koin.compose)
     implementation(libs.androidx.lifecycle.compose)
+    debugImplementation(libs.androidx.ui.tooling)
 }

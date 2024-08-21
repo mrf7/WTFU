@@ -46,17 +46,23 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                     arguments = listOf(navArgument("alarm") {
                         type = NavType.ReferenceType
                     }),
-                    deepLinks = listOf(navDeepLink { uriPattern = "https://mrfiend.com/{alarm}"})
+                    deepLinks = listOf(navDeepLink { uriPattern = "https://mrfiend.com/{alarm}" })
                 ) { backstackEntry ->
-                    AlarmTriggerScreen(backstackEntry.arguments!!.getInt("alarm"),viewModel)
+                    AlarmTriggerScreen(
+                        backstackEntry.arguments!!.getInt("alarm"),
+                        viewModel,
+                        onDismiss = { navController.popBackStack() })
                 }
                 composable("AlarmList") {
                     AlarmListScreen(
                         alarms = alarms,
                         newAlarm = { navController.navigate("AlarmEdit") },
                         onAlarmClicked = {
+//                            navController.navigate(
+//                                "AlarmEdit?alarm=${it.id}"
+//                            )
                             navController.navigate(
-                                "AlarmEdit?alarm=${it.id}"
+                                "AlarmTrigger?alarm=${it.id}"
                             )
                         })
                 }
