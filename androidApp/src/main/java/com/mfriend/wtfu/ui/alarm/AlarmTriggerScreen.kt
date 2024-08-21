@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,16 +58,16 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmViewModel) {
+fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmViewModel, onDismiss: () -> Unit) {
     val alarm by viewModel.getAlarm(alarmId).collectAsState(null)
-    AlarmScreenInner(alarm)
+    AlarmScreenInner(alarm, onDismiss)
 }
 
 @Composable
-private fun AlarmScreenInner(alarm: Alarm?) {
+private fun AlarmScreenInner(alarm: Alarm?, onDismiss: () -> Unit) {
     var dismiss by remember { mutableStateOf(false) }
     if (dismiss) {
-        AlarmDismiss(alarm) { dismiss = false }
+        AlarmDismiss(alarm, onDismiss)
     } else {
         AlarmTrigger { dismiss = true }
     }
@@ -90,30 +91,51 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
     }
 
     fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second
-    Column() {
-        Text(
-            "${numbers.first} + ${numbers.second} = ",
-            Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Text(
+    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxWidth().weight(0.5f)) {
+            Text(
+                "${numbers.first} + ${numbers.second} = ",
+                Modifier.align(Alignment.CenterHorizontally),
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Text(
+                answerText,
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 50.dp)
+                    .border(1.dp, Color.Black)
+                    .sizeIn(200.dp),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.End
+            )
+        }
+        NumberEntry(
+            Modifier.fillMaxWidth().weight(0.5f),
             answerText,
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 50.dp)
-                .border(1.dp, Color.Black)
-                .sizeIn(200.dp),
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.End
+            onValueChange = { answerText = it },
+            onSubmit = { if (checkAnswer()) onDismiss() }
         )
+    }
+}
+
+// Using a string here is jank, but made pulling it into a function quicker. TODO make this better/more generic to use
+@Composable
+private fun NumberEntry(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSubmit: () -> Unit
+) {
+    Column(modifier) {
         (9 downTo 1).chunked(3).forEach { rowNums ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.Center) {
                 rowNums.reversed().forEach {
                     Button(
-                        onClick = { answerText += it.toString() },
+                        onClick = { onValueChange(value + it.toString()) },
                         Modifier
                             .weight(1f)
-                            .padding(5.dp),
+                            .padding(5.dp)
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(5)
                     ) {
                         Text(it.toString())
@@ -121,32 +143,35 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
                 }
             }
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.Center) {
             Button(
-                onClick = { answerText = answerText.dropLast(1) },
+                onClick = { onValueChange(value.dropLast(1)) },
                 Modifier
                     .weight(1f)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
                 Icon(Icons.Default.ArrowBack, "Back")
             }
 
             Button(
-                onClick = { answerText += 0.toString() },
+                onClick = { onValueChange(value + 0.toString()) },
                 Modifier
                     .weight(1f)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
                 Text("0")
             }
 
             Button(
-                onClick = { if (checkAnswer()) onDismiss() },
+                onClick = onSubmit,
                 Modifier
                     .weight(1f)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
                 Icon(Icons.Default.Check, "Done")
@@ -264,7 +289,7 @@ private fun AlarmTriggerPreview() {
 private fun AlarmScreenPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = MathMission()))
+            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = MathMission())) {}
         }
     }
 }

@@ -38,6 +38,7 @@ multiplatformSettings = "1.1.1"
 turbine = "1.0.0"
 sqlDelight = "2.0.1"
 uiToolingPreview = "1.6.7"
+uiTooling = "1.6.8"
 
 [libraries]
 android-desugaring = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-desugaring" }
@@ -92,6 +93,7 @@ touchlab-skie-annotations = { module = "co.touchlab.skie:configuration-annotatio
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 [plugins]
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
