@@ -23,7 +23,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
-        notificationManager.cancel(3)
         super.onCreate(savedInstanceState)
         setContent {
             AlarmApp()
@@ -58,11 +57,8 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                         alarms = alarms,
                         newAlarm = { navController.navigate("AlarmEdit") },
                         onAlarmClicked = {
-//                            navController.navigate(
-//                                "AlarmEdit?alarm=${it.id}"
-//                            )
                             navController.navigate(
-                                "AlarmTrigger?alarm=${it.id}"
+                                "AlarmEdit?alarm=${it.id}"
                             )
                         })
                 }

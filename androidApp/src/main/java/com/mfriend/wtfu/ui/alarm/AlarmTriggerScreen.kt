@@ -88,7 +88,7 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
     }
 
     fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second
-    Column(Modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().weight(0.5f), verticalArrangement = Arrangement.Center) {
             Text(
                 "${numbers.first} + ${numbers.second} = ",
