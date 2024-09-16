@@ -9,12 +9,11 @@ targetSdk = "34"
 compileSdk = "34"
 
 # Dependencies
-kotlin = "1.9.22"
+kotlin = "2.0.20"
 
 android-gradle-plugin = "8.2.2"
 
 compose = "1.7.1"
-composeCompiler = "1.5.15"
 
 android-desugaring = "2.0.4"
 androidx-core = "1.13.1"
@@ -47,7 +46,6 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 androidx-test-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-junit" }
 
 compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "composeCompiler" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 #compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
@@ -92,6 +90,7 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
 cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [bundles]
 #app-ui = [
