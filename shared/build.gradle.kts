@@ -33,11 +33,13 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api("androidx.lifecycle:lifecycle-viewmodel:2.8.0-rc01")
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
-                implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
-                api("io.insert-koin:koin-core:3.4.1")
-                implementation("app.cash.sqldelight:primitive-adapters:2.0.0")
+                api(libs.lifecycle.viewmodel)
+                api(libs.kotlinx.dateTime)
+                implementation(libs.coroutines.core)
+                implementation(libs.sqlDelight.coroutinesExt)
+                api(libs.koin.core)
+                implementation(libs.primitive.adapters)
+                api(libs.touchlab.kermit)
             }
         }
         commonTest {
@@ -47,12 +49,12 @@ kotlin {
         }
         androidMain {
             dependencies {
-                implementation("app.cash.sqldelight:android-driver:2.0.0")
+                implementation(libs.sqlDelight.android)
             }
         }
         iosMain {
             dependencies {
-                implementation("app.cash.sqldelight:native-driver:2.0.0")
+                implementation(libs.sqlDelight.native)
             }
         }
     }
