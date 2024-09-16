@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.AlarmViewModel
 import com.mfriend.wtfu.MathMission
@@ -76,10 +77,6 @@ private fun AlarmScreenInner(alarm: Alarm?, onDismiss: () -> Unit) {
 @Composable
 private fun AlarmDismiss(alarm: Alarm?, onDismiss: () -> Unit) {
     MathMissionScreen(onDismiss = onDismiss)
-//    when (alarm?.missions?.firstOrNull()) {
-//        is MathMission -> MathMissionScreen(onDismiss = onDismiss)
-//        null -> TODO()
-//    }
 }
 
 @Composable
@@ -92,11 +89,11 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
 
     fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second
     Column(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxWidth().weight(0.5f)) {
+        Column(Modifier.fillMaxWidth().weight(0.5f), verticalArrangement = Arrangement.Center) {
             Text(
                 "${numbers.first} + ${numbers.second} = ",
                 Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.displaySmall
             )
             Text(
                 answerText,
@@ -105,7 +102,7 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
                     .padding(horizontal = 50.dp)
                     .border(1.dp, Color.Black)
                     .sizeIn(200.dp),
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.End
             )
         }
@@ -134,11 +131,11 @@ private fun NumberEntry(
                         onClick = { onValueChange(value + it.toString()) },
                         Modifier
                             .weight(1f)
-                            .padding(5.dp)
+                            .padding(4.dp)
                             .fillMaxHeight(),
                         shape = RoundedCornerShape(5)
                     ) {
-                        Text(it.toString())
+                        Text(it.toString(), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                     }
                 }
             }
@@ -148,7 +145,7 @@ private fun NumberEntry(
                 onClick = { onValueChange(value.dropLast(1)) },
                 Modifier
                     .weight(1f)
-                    .padding(5.dp)
+                    .padding(4.dp)
                     .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
@@ -159,18 +156,18 @@ private fun NumberEntry(
                 onClick = { onValueChange(value + 0.toString()) },
                 Modifier
                     .weight(1f)
-                    .padding(5.dp)
+                    .padding(4.dp)
                     .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
-                Text("0")
+                Text("0", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
             }
 
             Button(
                 onClick = onSubmit,
                 Modifier
                     .weight(1f)
-                    .padding(5.dp)
+                    .padding(4.dp)
                     .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
