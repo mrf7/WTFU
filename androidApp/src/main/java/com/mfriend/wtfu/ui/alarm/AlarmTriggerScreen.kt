@@ -184,13 +184,13 @@ private fun AlarmTrigger(onDismiss: () -> Unit) {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DateTimeHeader(Modifier.padding(vertical = 20.dp))
+        DateTimeHeader(Modifier.padding(vertical = 20.dp).weight(1f))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { /*TODO #16 Implement snooze */ },
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 20.dp),
             ) {
                 Text(text = "Snooze")
             }
@@ -230,12 +230,12 @@ private fun DateTimeHeader(modifier: Modifier = Modifier) {
     ) {
         Text(
             dateString,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(bottom = 10.dp)
         )
         Text(
             timeString,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
     }
