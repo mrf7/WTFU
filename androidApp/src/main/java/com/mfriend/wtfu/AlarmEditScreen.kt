@@ -50,8 +50,8 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AlarmEditScreen(alarmId: Int, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
-    val alarm by viewModel.getAlarm(alarmId).collectAsState(null)
+fun AlarmEditScreen(alarmId: Int?, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
+    val alarm by viewModel.getAlarm(alarmId?: -1).collectAsState(null)
     Scaffold { padding ->
         AlarmEdit(
             Modifier.padding(padding), alarm,

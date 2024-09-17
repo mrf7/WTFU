@@ -8,13 +8,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import com.mfriend.wtfu.ui.alarm.AlarmTriggerScreen
+import kotlinx.serialization.Serializable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
@@ -30,6 +30,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+@Serializable
+object AlarmList
+@Serializable
+data class AlarmEdit(val id: Int? = null)
+@Serializable
+data class AlarmTrigger(val id: Int)
+
 @Composable
 fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
     WTFUTheme {
@@ -40,19 +48,16 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                 navController = navController,
                 startDestination = "AlarmList",
             ) {
-                composable(
-                    "AlarmTrigger?alarm={alarm}",
-                    arguments = listOf(navArgument("alarm") {
-                        type = NavType.ReferenceType
-                    }),
+                composable<AlarmTrigger>(
                     deepLinks = listOf(navDeepLink { uriPattern = "https://mrfiend.com/{alarm}" })
                 ) { backstackEntry ->
+                    val route: AlarmTrigger = backstackEntry.toRoute()
                     AlarmTriggerScreen(
-                        backstackEntry.arguments!!.getInt("alarm"),
+                        route.id,
                         viewModel,
                         onDismiss = { navController.popBackStack() })
                 }
-                composable("AlarmList") {
+                composable<AlarmList> {
                     AlarmListScreen(
                         alarms = alarms,
                         newAlarm = { navController.navigate("AlarmEdit") },
@@ -62,15 +67,11 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                             )
                         })
                 }
-                composable(
-                    "AlarmEdit?alarm={alarm}",
-                    arguments = listOf(navArgument("alarm") {
-                        type = NavType.IntType
-                        defaultValue = -1
-                    })
+                composable<AlarmEdit>(
                 ) { backstackEntry ->
+                    val route: AlarmEdit = backstackEntry.toRoute()
                     AlarmEditScreen(
-                        backstackEntry.arguments!!.getInt("alarm"),
+                        route.id,
                         alarmSaved = { navController.popBackStack() },
                         viewModel = viewModel
                     )
