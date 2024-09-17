@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -47,6 +48,7 @@ dependencies {
     implementation(libs.compose.activity)
     implementation(libs.compose.material3)
     implementation(libs.compose.navigation)
+    implementation(libs.kotlinx.serialization)
     implementation(libs.koin.compose)
     implementation(libs.androidx.lifecycle.compose)
     debugImplementation(libs.androidx.ui.tooling)
