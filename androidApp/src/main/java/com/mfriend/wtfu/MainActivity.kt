@@ -46,10 +46,12 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
             val alarms by viewModel.alarmsFlow.collectAsState(initial = emptyList())
             NavHost(
                 navController = navController,
-                startDestination = "AlarmList",
+                startDestination = AlarmList,
             ) {
                 composable<AlarmTrigger>(
-                    deepLinks = listOf(navDeepLink { uriPattern = "https://mrfiend.com/{alarm}" })
+                    deepLinks = listOf(
+                        navDeepLink<AlarmTrigger>(basePath = "https://mrfiend.com/trigger")
+                    )
                 ) { backstackEntry ->
                     val route: AlarmTrigger = backstackEntry.toRoute()
                     AlarmTriggerScreen(
@@ -63,7 +65,7 @@ fun AlarmApp(viewModel: AlarmViewModel = koinViewModel()) {
                         newAlarm = { navController.navigate("AlarmEdit") },
                         onAlarmClicked = {
                             navController.navigate(
-                                "AlarmEdit?alarm=${it.id}"
+                                AlarmEdit(it.id)
                             )
                         })
                 }

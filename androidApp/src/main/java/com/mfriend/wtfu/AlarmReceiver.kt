@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -20,9 +21,8 @@ class AlarmReceiver : BroadcastReceiver() {
         // Right now this only shows as a regular notification if youre looking at your phone so
         // you can just keep using your phone if
         createNotificationChannel(context)
-        val fullScreenIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val alarmId = intent.getIntExtra("EXTRA_ALARM", -1)
+        val fullScreenIntent = Intent(Intent.ACTION_VIEW, "https://mrfiend.com/trigger/${alarmId}".toUri(), context, MainActivity::class.java)
 
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context, 0,

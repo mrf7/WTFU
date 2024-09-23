@@ -83,8 +83,9 @@ private fun AlarmDismiss(alarm: Alarm?, onDismiss: () -> Unit) {
 private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) {
     var answerText by remember { mutableStateOf("") }
 
+    // TODO For testing make it harder
     val numbers = remember {
-        Pair(Random.nextInt(10, 100), Random.nextInt(10, 100))
+        Pair(Random.nextInt(1, 10), Random.nextInt(10, 100))
     }
 
     fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second

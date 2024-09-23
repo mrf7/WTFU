@@ -33,7 +33,9 @@ class AlarmViewModel(private val database: DatabaseHelper, private val alarmSche
     fun saveAlarm(alarm: Alarm) {
         viewModelScope.launch { database.insertAlam(alarm) }
     }
+
     fun scheduleAlarm(alarm: Alarm) {
+        saveAlarm(alarm)
        alarmScheduler.scheduleNotification(alarm)
     }
 }
