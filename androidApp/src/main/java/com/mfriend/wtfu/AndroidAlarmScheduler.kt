@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.net.toUri
+import com.mfriend.wtfu.ui.MainActivity
 import kotlinx.datetime.Instant
 
 class AndroidAlarmScheduler(private val alarmManager: AlarmManager, private val context: Context) :

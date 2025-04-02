@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import com.mfriend.wtfu.ui.MainActivity
 
 class AlarmReceiver : BroadcastReceiver() {
 
