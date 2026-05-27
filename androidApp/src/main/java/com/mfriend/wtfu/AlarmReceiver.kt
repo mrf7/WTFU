@@ -49,6 +49,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .apply {
                 if (fullScreenAllowed) {
                     setFullScreenIntent(contentIntent, true)
+                    Log.d(TAG, "full-screen intent enabled for alarm $alarmId")
                 }
             }
             .build()
