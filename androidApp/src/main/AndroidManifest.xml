@@ -18,12 +18,18 @@
         <receiver
                 android:name=".AlarmReceiver"
                 android:enabled="true"
-                android:exported="false"/>
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.mfriend.wtfu.action.ALARM_FIRE"/>
+            </intent-filter>
+        </receiver>
 
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
                 android:launchMode="singleTop"
+                android:showWhenLocked="true"
+                android:turnScreenOn="true"
                 android:showOnLockScreen="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
