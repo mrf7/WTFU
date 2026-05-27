@@ -46,6 +46,11 @@ class AlarmViewModel(
     }
 
     fun scheduleAlarm(alarm: Alarm) {
-        alarmScheduler.schedule(alarm)
+        viewModelScope.launch {
+            val toSchedule = if (alarm.id == null) database.insertAlam(alarm) else alarm
+            if (toSchedule.enabled) {
+                alarmScheduler.schedule(toSchedule)
+            }
+        }
     }
 }

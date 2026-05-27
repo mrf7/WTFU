@@ -342,9 +342,10 @@ fun TimePickerViewDialog(
     onConfirm: (hour: Int, minute: Int) -> Unit
 ) {
     val context = LocalContext.current
+    // Alarm.hour is 0–23; 12-hour picker reports 0–11 without AM/PM in this callback.
     val timePicker = TimePickerDialog(context, { _, selectedHour: Int, selectedMinute: Int ->
         onConfirm(selectedHour, selectedMinute)
-    }, initialHour, initialMinute, false)
+    }, initialHour, initialMinute, true)
     DisposableEffect(true) {
         timePicker.show()
         timePicker.setOnDismissListener { onCancel() }

@@ -11,8 +11,9 @@ import kotlinx.datetime.TimeZone
 
 class AndroidAlarmScheduler(
     private val alarmManager: AlarmManager,
-    private val context: Context,
+    context: Context,
 ) : AlarmScheduler {
+    private val context = context.applicationContext
     private val log = Logger.withTag("AndroidAlarmScheduler")
 
     override fun schedule(alarm: Alarm) {
@@ -62,7 +63,9 @@ class AndroidAlarmScheduler(
     }
 
     private fun alarmDeepLinkIntent(alarmId: Int): Intent =
-        Intent(Intent.ACTION_VIEW, "https://mrfiend.com/$alarmId".toUri(), context, MainActivity::class.java)
+        Intent(Intent.ACTION_VIEW, "https://mrfiend.com/$alarmId".toUri(), context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
 
     private fun showRequestCode(alarmId: Int) = alarmId + SHOW_REQUEST_CODE_OFFSET
 
