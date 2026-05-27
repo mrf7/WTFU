@@ -46,7 +46,7 @@ iOS: open `iosApp/iosApp.xcworkspace` in Xcode after Gradle/CocoaPods sync. Pref
 ## Android
 
 - **Jetpack Compose** + Material 3 for UI; keep composables dumb — state from ViewModels / `StateFlow`.
-- **Navigation Compose** for routing; pass IDs/primitives, not heavy objects, when possible.
+- **Navigation 3** (`NavDisplay`, `NavKey`, `rememberNavBackStack`) for routing; pass IDs/primitives, not heavy objects, when possible.
 - **Lifecycle**: use `viewModelScope` in ViewModels; cancel work automatically; avoid `GlobalScope`.
 - **Min/target SDK** values live in `gradle/libs.versions.toml` and module `build.gradle.kts` — align new dependencies with them.
 - Platform-only code (notifications, `AlarmManager`, permissions) stays in `androidApp` or `androidMain`, behind interfaces defined in `commonMain`.
