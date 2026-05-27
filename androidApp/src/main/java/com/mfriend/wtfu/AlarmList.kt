@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import java.time.DayOfWeek
+import kotlinx.datetime.DayOfWeek
 
 @Composable
 fun AlarmListScreen(alarms: List<Alarm>, onAlarmClicked: (Alarm) -> Unit, newAlarm: () -> Unit) {

@@ -1,25 +1,21 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.mfriend.wtfu"
-    compileSdk = 34
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.mfriend.wtfu"
-        minSdk = 29
-        targetSdk = 34
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
@@ -32,23 +28,23 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
+    implementation(platform(libs.koin.bom))
     implementation(project(":shared"))
     implementation(libs.compose.ui)
     implementation(libs.compose.tooling.preview)
     implementation(libs.compose.foundation)
     implementation(libs.compose.activity)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.navigation)
     implementation(libs.kotlinx.serialization)
+    implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.androidx.lifecycle.compose)
     debugImplementation(libs.androidx.ui.tooling)

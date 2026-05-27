@@ -44,7 +44,8 @@ import com.mfriend.wtfu.MathMission
 import com.mfriend.wtfu.RepeatMode
 import com.mfriend.wtfu.WTFUTheme
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -208,6 +209,7 @@ private fun AlarmTrigger(onDismiss: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 private fun DateTimeHeader(modifier: Modifier = Modifier) {
     var dateTime: LocalDateTime by remember {

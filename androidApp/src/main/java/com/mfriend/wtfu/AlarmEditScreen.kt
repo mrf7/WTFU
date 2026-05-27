@@ -43,7 +43,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -64,6 +65,7 @@ fun AlarmEditScreen(alarmId: Int?, viewModel: AlarmViewModel = koinViewModel(), 
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 private fun AlarmEdit(
     modifier: Modifier = Modifier,

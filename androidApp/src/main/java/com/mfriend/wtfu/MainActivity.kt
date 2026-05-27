@@ -17,6 +17,7 @@ import com.mfriend.wtfu.ui.alarm.AlarmTriggerScreen
 import kotlinx.serialization.Serializable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
+import kotlin.collections.emptyList
 
 class MainActivity : ComponentActivity() {
     private val notificationManager: NotificationManager by inject()
