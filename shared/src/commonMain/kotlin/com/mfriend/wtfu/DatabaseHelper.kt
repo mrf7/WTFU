@@ -25,9 +25,11 @@ class DatabaseHelper(driver: SqlDriver) {
         return alarmQueries.selectById(id).asFlow().mapToOneOrNull(Dispatchers.IO)
     }
 
-    suspend fun insertAlam(alarm: Alarm) {
-        withContext(Dispatchers.IO) {
+    suspend fun insertAlam(alarm: Alarm): Alarm {
+        return withContext(Dispatchers.IO) {
             alarmQueries.insert(alarm.id, alarm.hour, alarm.minute, alarm.enabled, alarm.sound)
+            val resolvedId = alarm.id ?: alarmQueries.lastInsertRowId().executeAsOne().toInt()
+            alarm.copy(id = resolvedId)
         }
     }
 

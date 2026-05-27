@@ -9,64 +9,70 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
+import co.touchlab.kermit.Logger
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        // Right now this only shows as a regular notification if youre looking at your phone so
-        // you can just keep using your phone if
+        val alarmId = intent.getIntExtra(EXTRA_ALARM_ID, -1)
+        if (alarmId < 0) {
+            Logger.withTag(TAG).w { "Alarm fired without valid id" }
+            return
+        }
         createNotificationChannel(context)
-        val fullScreenIntent = Intent(context, MainActivity::class.java).apply {
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "https://mrfiend.com/$alarmId".toUri(),
+            context,
+            MainActivity::class.java,
+        ).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-
         val fullScreenPendingIntent = PendingIntent.getActivity(
-            context, 0,
-            fullScreenIntent, PendingIntent.FLAG_IMMUTABLE
+            context,
+            alarmId,
+            deepLinkIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-
-        val builder = NotificationCompat.Builder(context, "ID")
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("My notification")
-            .setContentText("Hello World!")
+            .setContentTitle("Alarm")
+            .setContentText("Time to wake up")
             .setAutoCancel(true)
-            .setPriority(NotificationManager.IMPORTANCE_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setContentIntent(fullScreenPendingIntent)
-            .build()
-
         with(NotificationManagerCompat.from(context)) {
-            // notificationId is a unique int for each notification that you must define.
             if (ActivityCompat.checkSelfPermission(
                     context,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    Manifest.permission.POST_NOTIFICATIONS,
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                Log.d("MRF", "No perms")
+                Logger.withTag(TAG).w { "POST_NOTIFICATIONS not granted" }
                 return
             }
-            Log.d("MRF", "Notifying")
-            notify(3, builder)
+            notify(alarmId, builder.build())
         }
     }
 
     private fun createNotificationChannel(context: Context) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        val name = "Bing"
-        val descriptionText = "Bing bong ring rong"
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel("ID", name, importance).apply {
-            description = descriptionText
+        val channel = NotificationChannel(CHANNEL_ID, "Alarms", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Alarm notifications"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
-        // Register the channel with the system.
-        val notificationManager: NotificationManager =
+        val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
+
+    companion object {
+        const val EXTRA_ALARM_ID = "extra_alarm_id"
+        private const val CHANNEL_ID = "alarm_channel"
+        private const val TAG = "AlarmReceiver"
     }
 }

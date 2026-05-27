@@ -6,7 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class AlarmViewModel(private val database: DatabaseHelper, private val alarmScheduler: AlarmScheduler) : ViewModel() {
+class AlarmViewModel(
+    private val database: DatabaseHelper,
+    private val alarmScheduler: AlarmScheduler,
+) : ViewModel() {
     val alarmsFlow = database.getAlarms().map { alarms ->
         alarms.map {
             Alarm(
@@ -15,7 +18,7 @@ class AlarmViewModel(private val database: DatabaseHelper, private val alarmSche
                 repeat = RepeatMode.OneTime,
                 enabled = it.enabled,
                 sound = it.sound,
-                id = it.id
+                id = it.id,
             )
         }
     }
@@ -27,13 +30,22 @@ class AlarmViewModel(private val database: DatabaseHelper, private val alarmSche
     fun deleteAlarm(alarm: Alarm) {
         viewModelScope.launch {
             database.deleteAlarm(alarm)
+            alarm.id?.let { alarmScheduler.cancel(it) }
         }
     }
 
     fun saveAlarm(alarm: Alarm) {
-        viewModelScope.launch { database.insertAlam(alarm) }
+        viewModelScope.launch {
+            val saved = database.insertAlam(alarm)
+            if (saved.enabled) {
+                alarmScheduler.schedule(saved)
+            } else {
+                saved.id?.let { alarmScheduler.cancel(it) }
+            }
+        }
     }
+
     fun scheduleAlarm(alarm: Alarm) {
-       alarmScheduler.scheduleNotification(alarm)
+        alarmScheduler.schedule(alarm)
     }
 }

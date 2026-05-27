@@ -4,11 +4,11 @@ import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.AlarmScheduler
 
 class IosAlarmScheduler : AlarmScheduler {
-    override fun scheduleLaunch(alarm: Alarm) {
+    override fun schedule(alarm: Alarm) {
         // TODO ios alarm scheduling
     }
 
-    override fun scheduleNotification(alarm: Alarm) {
+    override fun cancel(alarmId: Int) {
         // TODO ios alarm scheduling
     }
 }

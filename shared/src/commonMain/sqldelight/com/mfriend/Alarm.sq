@@ -23,3 +23,6 @@ DELETE FROM AlarmDbo WHERE id = ?;
 
 deleteAll:
 DELETE FROM AlarmDbo;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
