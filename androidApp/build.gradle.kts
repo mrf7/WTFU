@@ -31,6 +31,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -50,4 +55,8 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.androidx.lifecycle.compose)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.kotest.framework.engine)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.sqlDelight.jvm)
 }

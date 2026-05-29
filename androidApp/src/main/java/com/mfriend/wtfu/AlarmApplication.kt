@@ -5,6 +5,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import com.mfriend.wtfu.di.initKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -15,10 +16,13 @@ class AlarmApplication : Application() {
             module {
                 viewModelOf(::AlarmViewModel)
                 single<Context> { this@AlarmApplication }
-                single<AlarmManager> { get<Context>().getSystemService(Context.ALARM_SERVICE) as AlarmManager }
+                single<AlarmManager> { get<Context>().getSystemService(ALARM_SERVICE) as AlarmManager }
                 single<AlarmScheduler> { AndroidAlarmScheduler(get(), get()) }
-                single { get<Context>().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
-            }
-        )
+                single<AlarmRinger> { AndroidAlarmRinger(get()) }
+                single { get<Context>().getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+            },
+        ) {
+            androidContext(this@AlarmApplication)
+        }
     }
 }

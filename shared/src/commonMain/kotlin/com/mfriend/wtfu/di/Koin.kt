@@ -7,7 +7,11 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-fun initKoin(appModule: Module): KoinApplication = startKoin { modules(appModule, platformModule, coreModule) }
+fun initKoin(appModule: Module, configure: KoinApplication.() -> Unit = {}): KoinApplication =
+    startKoin {
+        configure()
+        modules(appModule, platformModule, coreModule)
+    }
 
 private val coreModule = module {
     singleOf(::DatabaseHelper)

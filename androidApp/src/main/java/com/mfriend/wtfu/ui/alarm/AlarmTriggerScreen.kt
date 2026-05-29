@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
@@ -40,8 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mfriend.wtfu.Alarm
 import com.mfriend.wtfu.AlarmViewModel
-import com.mfriend.wtfu.MathMission
-import com.mfriend.wtfu.RepeatMode
 import com.mfriend.wtfu.WTFUTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Clock
@@ -62,14 +61,19 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmViewModel, onDismiss: () -> Unit) {
     val alarm by viewModel.getAlarm(alarmId).collectAsState(null)
-    AlarmScreenInner(alarm, onDismiss)
+    AlarmScreenInner(alarm, alarmId, viewModel, onDismiss)
 }
 
 @Composable
-private fun AlarmScreenInner(alarm: Alarm?, onDismiss: () -> Unit) {
+private fun AlarmScreenInner(
+    alarm: Alarm?,
+    alarmId: Int,
+    viewModel: AlarmViewModel,
+    onDismiss: () -> Unit,
+) {
     var dismiss by remember { mutableStateOf(false) }
     if (dismiss) {
-        AlarmDismiss(alarm, onDismiss)
+        AlarmDismiss(alarm, alarmId, viewModel, onDismiss)
     } else {
         AlarmTrigger { dismiss = true }
     }
@@ -77,8 +81,18 @@ private fun AlarmScreenInner(alarm: Alarm?, onDismiss: () -> Unit) {
 
 // TODO Pull data from actual alarm object and make alarm non nullable
 @Composable
-private fun AlarmDismiss(alarm: Alarm?, onDismiss: () -> Unit) {
-    MathMissionScreen(onDismiss = onDismiss)
+private fun AlarmDismiss(
+    alarm: Alarm?,
+    alarmId: Int,
+    viewModel: AlarmViewModel,
+    onDismiss: () -> Unit,
+) {
+    MathMissionScreen(
+        onDismiss = {
+            viewModel.stopRinging(alarmId)
+            onDismiss()
+        },
+    )
 }
 
 @Composable
@@ -89,7 +103,7 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
         Pair(Random.nextInt(10, 100), Random.nextInt(10, 100))
     }
 
-    fun checkAnswer() = answerText.toInt() == numbers.first + numbers.second
+    fun checkAnswer() = answerText.toIntOrNull() == numbers.first + numbers.second
     Column(modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().weight(0.5f), verticalArrangement = Arrangement.Center) {
             Text(
@@ -151,7 +165,7 @@ private fun NumberEntry(
                     .fillMaxHeight(),
                 shape = RoundedCornerShape(5)
             ) {
-                Icon(Icons.Default.ArrowBack, "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
             }
 
             Button(
@@ -248,7 +262,7 @@ private fun formatDate(date: LocalDate): String {
     return date.format(LocalDate.Format {
         monthName(MonthNames.ENGLISH_FULL)
         char(' ')
-        dayOfMonth()
+        day()
         char(' ')
         dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
     })
@@ -289,7 +303,7 @@ private fun AlarmTriggerPreview() {
 private fun AlarmScreenPreview() {
     WTFUTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            AlarmScreenInner(alarm = Alarm(3, 11, repeat = RepeatMode.OneTime, missions = MathMission())) {}
+            MathMissionScreen(onDismiss = {})
         }
     }
 }

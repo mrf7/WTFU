@@ -42,6 +42,9 @@ iOS: open `iosApp/iosApp.xcworkspace` in Xcode after Gradle/CocoaPods sync. Pref
 - **SQLDelight** for persistence; keep queries in `.sq` files and map to domain types in Kotlin.
 - **SKIE** is enabled for smoother Swift interop — design public APIs in `shared` with ObjC/Swift consumers in mind (stable names, avoid overly nested generics where SKIE struggles).
 - Avoid using expect/actual. Platform implementations should conform to an interface that can be used by shared code and be injected via DI. 
+- Write code with multiplatform extensibility in mind. 
+  - Any code that is not platform dependent should be in shared commonMain
+  - Any functionality that is required for both platforms but with a different implementation should be used by common code as an interface that can be implemented by each platform and injected via DI. 
 
 ## Android
 
@@ -65,6 +68,8 @@ iOS: open `iosApp/iosApp.xcworkspace` in Xcode after Gradle/CocoaPods sync. Pref
 - Name packages under `com.mfriend.wtfu`; keep file names aligned with primary types.
 - Small, focused types; one responsibility per class/function.
 - Comments only for non-obvious business rules — not for narrating obvious code.
+- Any class that could have alternate implementations or interacts with platform dependencies should implement an interface for ease of testing and multiplatform implementations
+- All code should be clearly documented. Methods and classes should have appropriate and concises kdoc comments and any logic within functions that is unintuitive or is a workaround based on limits like android permissions should be explained with a comment containing a link to the relevant docs.
 
 ## Error handling with Arrow Kt
 

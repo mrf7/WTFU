@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 class AlarmViewModel(
     private val database: DatabaseHelper,
     private val alarmScheduler: AlarmScheduler,
+    private val alarmRinger: AlarmRinger,
 ) : ViewModel() {
     val alarmsFlow = database.getAlarms().map { alarms ->
         alarms.map {
@@ -23,9 +24,7 @@ class AlarmViewModel(
         }
     }
 
-    fun getAlarm(id: Int): Flow<Alarm?> {
-        return database.getAlarm(id).map { it?.toAlarm() }
-    }
+    fun getAlarm(id: Int): Flow<Alarm?> = database.getAlarm(id)
 
     fun deleteAlarm(alarm: Alarm) {
         viewModelScope.launch {
@@ -52,5 +51,9 @@ class AlarmViewModel(
                 alarmScheduler.schedule(toSchedule)
             }
         }
+    }
+
+    fun stopRinging(alarmId: Int) {
+        alarmRinger.stop(alarmId)
     }
 }

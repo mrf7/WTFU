@@ -1,20 +1,18 @@
 package com.mfriend.wtfu
 
 import android.app.ActivityOptions
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
 import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -26,48 +24,32 @@ class AlarmReceiver : BroadcastReceiver() {
             return
         }
         Logger.withTag(TAG).d { "Alarm fired for id $alarmId" }
-        postAlarmNotification(context.applicationContext, alarmId)
+
+        val appContext = context.applicationContext
+        val koin = GlobalContext.get()
+        koin.get<AlarmRinger>().start(alarmId)
+        rescheduleAlarm(koin, alarmId)
+        launchAlarmUi(alarmContentPendingIntent(appContext, alarmId))
     }
 
-    private fun postAlarmNotification(context: Context, alarmId: Int) {
-        if (!AlarmNotificationPermissions.canPostNotifications(context)) {
-            Log.w(TAG, "POST_NOTIFICATIONS not granted")
-            return
-        }
-        createNotificationChannel(context)
-        val contentIntent = alarmContentPendingIntent(context, alarmId)
-        val fullScreenAllowed = AlarmNotificationPermissions.canUseFullScreenIntent(context)
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Alarm")
-            .setContentText("Time to wake up")
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentIntent(contentIntent)
-            .apply {
-                if (fullScreenAllowed) {
-                    setFullScreenIntent(contentIntent, true)
-                    Log.d(TAG, "full-screen intent enabled for alarm $alarmId")
+    private fun rescheduleAlarm(koin: Koin, alarmId: Int) {
+        val database = koin.get<DatabaseHelper>()
+        val scheduler = koin.get<AlarmScheduler>()
+        runBlocking {
+            val alarm = database.getAlarm(alarmId).first() ?: return@runBlocking
+            when (alarm.repeat) {
+                RepeatMode.OneTime -> {
+                    scheduler.cancel(alarmId)
+                    if (alarm.enabled) {
+                        database.insertAlam(alarm.copy(enabled = false))
+                    }
                 }
+                else -> if (alarm.enabled) scheduler.schedule(alarm)
             }
-            .build()
-        try {
-            NotificationManagerCompat.from(context).notify(alarmId, notification)
-            Log.i(TAG, "notified alarm $alarmId fullScreen=$fullScreenAllowed")
-        } catch (e: SecurityException) {
-            Log.e(TAG, "notify failed", e)
-            launchAlarmUi(context, contentIntent)
-            return
-        }
-        if (!fullScreenAllowed) {
-            Log.w(TAG, "full-screen intent disabled; launching activity")
-            launchAlarmUi(context, contentIntent)
         }
     }
 
-    private fun launchAlarmUi(context: Context, contentIntent: PendingIntent) {
+    private fun launchAlarmUi(contentIntent: PendingIntent) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 val options = ActivityOptions.makeBasic().apply {
@@ -102,28 +84,9 @@ class AlarmReceiver : BroadcastReceiver() {
         )
     }
 
-    private fun createNotificationChannel(context: Context) {
-        val channel = NotificationChannel(CHANNEL_ID, "Alarms", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "Alarm notifications"
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            setBypassDnd(true)
-            setSound(
-                android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build(),
-            )
-        }
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-    }
-
     companion object {
         const val ACTION_ALARM_FIRE = "com.mfriend.wtfu.action.ALARM_FIRE"
         const val EXTRA_ALARM_ID = "extra_alarm_id"
-        private const val CHANNEL_ID = "alarm_channel"
         private const val TAG = "AlarmReceiver"
     }
 }

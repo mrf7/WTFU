@@ -10,7 +10,6 @@ import com.mfriend.AlarmDbo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -21,8 +20,12 @@ class DatabaseHelper(driver: SqlDriver) {
         return alarmQueries.selectAll().asFlow().mapToList(Dispatchers.IO)
     }
 
-    fun getAlarm(id: Int): Flow<AlarmDbo?> {
-        return alarmQueries.selectById(id).asFlow().mapToOneOrNull(Dispatchers.IO)
+    fun getAlarm(id: Int): Flow<Alarm?> {
+        return alarmQueries.selectById(id).asFlow().mapToOneOrNull(Dispatchers.IO).map { it?.toAlarm() }
+    }
+
+    suspend fun getEnabledAlarms(): List<Alarm> = withContext(Dispatchers.IO) {
+        alarmQueries.selectAll().executeAsList().map { it.toAlarm() }.filter { it.enabled }
     }
 
     suspend fun insertAlam(alarm: Alarm): Alarm {
