@@ -11,13 +11,30 @@ import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
-class AlarmReceiver : BroadcastReceiver() {
+class AlarmReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != ACTION_ALARM_FIRE) return
+        when (intent.action) {
+            ACTION_RESTORE_ALARMS -> {
+                val pendingResult = goAsync()
+                Thread {
+                    try {
+                        restoreEnabledAlarms()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to restore alarms", e)
+                    } finally {
+                        pendingResult.finish()
+                    }
+                }.start()
+            }
+            ACTION_ALARM_FIRE -> handleAlarmFire(context, intent)
+        }
+    }
+
+    private fun handleAlarmFire(context: Context, intent: Intent) {
         val alarmId = intent.getIntExtra(EXTRA_ALARM_ID, -1)
         if (alarmId < 0) {
             Logger.withTag(TAG).w { "Alarm fired without valid id" }
@@ -26,15 +43,14 @@ class AlarmReceiver : BroadcastReceiver() {
         Logger.withTag(TAG).d { "Alarm fired for id $alarmId" }
 
         val appContext = context.applicationContext
-        val koin = GlobalContext.get()
-        koin.get<AlarmRinger>().start(alarmId)
-        rescheduleAlarm(koin, alarmId)
+        get<AlarmRinger>().start(alarmId)
+        rescheduleAlarm(alarmId)
         launchAlarmUi(alarmContentPendingIntent(appContext, alarmId))
     }
 
-    private fun rescheduleAlarm(koin: Koin, alarmId: Int) {
-        val database = koin.get<DatabaseHelper>()
-        val scheduler = koin.get<AlarmScheduler>()
+    private fun rescheduleAlarm(alarmId: Int) {
+        val database = get<DatabaseHelper>()
+        val scheduler = get<AlarmScheduler>()
         runBlocking {
             val alarm = database.getAlarm(alarmId).first() ?: return@runBlocking
             when (alarm.repeat) {
@@ -46,6 +62,16 @@ class AlarmReceiver : BroadcastReceiver() {
                 }
                 else -> if (alarm.enabled) scheduler.schedule(alarm)
             }
+        }
+    }
+
+    private fun restoreEnabledAlarms() {
+        runBlocking {
+            val database = get<DatabaseHelper>()
+            val scheduler = get<AlarmScheduler>()
+            val alarms = database.getEnabledAlarms()
+            Log.i(TAG, "Restoring ${alarms.size} enabled alarm(s)")
+            alarms.forEach { scheduler.schedule(it) }
         }
     }
 
@@ -86,6 +112,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object {
         const val ACTION_ALARM_FIRE = "com.mfriend.wtfu.action.ALARM_FIRE"
+        const val ACTION_RESTORE_ALARMS = "com.mfriend.wtfu.action.RESTORE_ALARMS"
         const val EXTRA_ALARM_ID = "extra_alarm_id"
         private const val TAG = "AlarmReceiver"
     }

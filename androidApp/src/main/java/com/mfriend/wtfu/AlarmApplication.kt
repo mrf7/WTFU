@@ -5,6 +5,8 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import com.mfriend.wtfu.di.initKoin
+import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -24,5 +26,16 @@ class AlarmApplication : Application() {
         ) {
             androidContext(this@AlarmApplication)
         }
+        Thread {
+            try {
+                runBlocking {
+                    val database = get<DatabaseHelper>()
+                    val scheduler = get<AlarmScheduler>()
+                    database.getEnabledAlarms().forEach { scheduler.schedule(it) }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("AlarmApplication", "Failed to restore alarms on startup", e)
+            }
+        }.start()
     }
 }

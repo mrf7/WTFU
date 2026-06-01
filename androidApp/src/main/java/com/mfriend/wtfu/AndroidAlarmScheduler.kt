@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 class AndroidAlarmScheduler(
     private val alarmManager: AlarmManager,
@@ -18,6 +18,10 @@ class AndroidAlarmScheduler(
 
     override fun schedule(alarm: Alarm) {
         val alarmId = alarm.id ?: return
+        if (!AlarmNotificationPermissions.canScheduleExactAlarms(context)) {
+            log.w { "Cannot schedule alarm $alarmId; exact alarm permission missing" }
+            return
+        }
         val triggerAtMillis = triggerAtMillis(alarm)
         if (triggerAtMillis == null) {
             log.d { "Skipping schedule for alarm $alarmId (no next trigger)" }
@@ -27,8 +31,12 @@ class AndroidAlarmScheduler(
         val operation = alarmOperationPendingIntent(alarmId) ?: return
         val showIntent = showActivityPendingIntent(alarmId)
         val info = AlarmManager.AlarmClockInfo(triggerAtMillis, showIntent)
-        alarmManager.setAlarmClock(info, operation)
-        log.d { "Scheduled alarm $alarmId at $triggerAtMillis (${Instant.fromEpochMilliseconds(triggerAtMillis)})" }
+        try {
+            alarmManager.setAlarmClock(info, operation)
+            log.d { "Scheduled alarm $alarmId at $triggerAtMillis (${Instant.fromEpochMilliseconds(triggerAtMillis)})" }
+        } catch (e: SecurityException) {
+            log.e(e) { "Failed to schedule alarm $alarmId" }
+        }
     }
 
     override fun cancel(alarmId: Int) {
