@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.mfriend.wtfu
 
 import android.app.TimePickerDialog
@@ -7,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -43,16 +46,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
+import androidx.compose.ui.window.DialogProperties
+import com.mfriend.wtfu.ui.SwitchingTimePickerDialog
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun AlarmEditScreen(alarmId: Int?, viewModel: AlarmViewModel = koinViewModel(), alarmSaved: () -> Unit) {
-    val alarm by viewModel.getAlarm(alarmId?: -1).collectAsState(null)
+    val alarm by viewModel.getAlarm(alarmId ?: -1).collectAsState(null)
     Scaffold { padding ->
         AlarmEdit(
             Modifier.padding(padding), alarm,
@@ -91,12 +96,12 @@ private fun AlarmEdit(
         var showRepeatMode by remember { mutableStateOf(false) }
         var showTimePicker by remember { mutableStateOf(false) }
         if (showTimePicker) {
-            TimePickerViewDialog(
+            SwitchingTimePickerDialog(
                 initialHour = tempAlarm.hour,
                 initialMinute = tempAlarm.minute,
-                onCancel = { showTimePicker = false },
-                onConfirm = { hour, minute ->
-                    tempAlarm = tempAlarm.copy(hour, minute)
+                onDismiss = { showTimePicker = false },
+                onConfirm = { state ->
+                    tempAlarm = tempAlarm.copy(hour = state.hour, minute = state.minute)
                     showTimePicker = false
                 })
         }
@@ -129,13 +134,12 @@ private fun AlarmEdit(
         Spacer(modifier = Modifier.height(10.dp))
 
         MissionsCard(
-            mission = tempAlarm.missions,
-            onNewMissions = {},
-            addMission = { tempAlarm = tempAlarm.copy(missions = MathMission()) })
+            mission = tempAlarm.missions
+        ) { tempAlarm = tempAlarm.copy(missions = MathMission()) }
         Spacer(modifier = Modifier.height(10.dp))
 
         /**todo navigate**/
-        SoundCard(tempAlarm.sound) { /**todo navigate**/ }
+        SoundCard(tempAlarm.sound)
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = { addAlarm(tempAlarm) }) {
             Text("Save")
@@ -177,7 +181,6 @@ private fun TimeRepeatCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RepeatPickerDialog(
     repeatMode: RepeatMode,
@@ -188,81 +191,94 @@ private fun RepeatPickerDialog(
     // just switch to list
     val selected = remember {
         mutableStateListOf<Boolean>().also { list ->
-            DayOfWeek.values().forEach {
+            DayOfWeek.entries.forEach {
                 list.add(days.contains(it))
             }
         }
     }
 
-    AlertDialog(
+    BasicAlertDialog(
         onDismissRequest = onDismiss,
-        Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 10.dp)
-    ) {
-        Column {
-            Text(
-                "Repeat",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Card(
-                    border = BorderStroke(1.dp, Color.Black),
-                    modifier = Modifier.clickable {
-                        RepeatMode.Weekdays.days.forEach {
-                            selected[it.ordinal] = true
-                        }
-                    }
+        modifier = Modifier,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    )
+    {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 6.dp,
+            modifier =
+                Modifier
+                    .width(IntrinsicSize.Min)
+                    .height(IntrinsicSize.Min)
+                    .background(
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.surface
+                    ),
+        ) {
+            Column {
+                Text(
+                    "Repeat",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Text("+Weekdays", Modifier.padding(5.dp))
-                }
-                Card(
-                    border = BorderStroke(1.dp, Color.Black),
-                    modifier = Modifier.clickable {
-                        RepeatMode.Weekends.days.forEach {
-                            selected[it.ordinal] = true
+                    Card(
+                        border = BorderStroke(1.dp, Color.Black),
+                        modifier = Modifier.clickable {
+                            RepeatMode.Weekdays.days.forEach {
+                                selected[it.ordinal] = true
+                            }
                         }
+                    ) {
+                        Text("+Weekdays", Modifier.padding(5.dp))
                     }
-                ) {
-                    Text("+Weekends", Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                    Card(
+                        border = BorderStroke(1.dp, Color.Black),
+                        modifier = Modifier.clickable {
+                            RepeatMode.Weekends.days.forEach {
+                                selected[it.ordinal] = true
+                            }
+                        }
+                    ) {
+                        Text("+Weekends", Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                    }
                 }
-            }
 
-            DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
-                Row {
-                    Checkbox(
-                        checked = selected[index],
-                        onCheckedChange = { selected[index] = it })
+                DayOfWeek.entries.forEachIndexed { index, dayOfWeek ->
+                    Row {
+                        Checkbox(
+                            checked = selected[index],
+                            onCheckedChange = { selected[index] = it })
+                        Text(
+                            dayOfWeek.name,
+                            Modifier.align(Alignment.CenterVertically),
+                        )
+                    }
+                }
+                Button(onClick = {
+                    val selectedDays =
+                        DayOfWeek.entries.filterIndexed { index, _ -> selected[index] }.toSet()
+                    val repeat = when {
+                        selectedDays.isEmpty() -> RepeatMode.OneTime
+                        selectedDays == RepeatMode.Weekdays.days -> RepeatMode.Weekdays
+                        selectedDays == RepeatMode.Weekends.days -> RepeatMode.Weekends
+                        selectedDays == RepeatMode.EveryDay.days -> RepeatMode.EveryDay
+                        else -> RepeatMode.Custom(selectedDays)
+                    }
+                    onConfirm(repeat)
+                    onDismiss()
+                }) {
                     Text(
-                        dayOfWeek.name,
-                        Modifier.align(Alignment.CenterVertically),
+                        "Done",
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp), textAlign = TextAlign.Center
                     )
                 }
-            }
-            Button(onClick = {
-                val selectedDays =
-                    DayOfWeek.values().filterIndexed { index, _ -> selected[index] }.toSet()
-                val repeat = when {
-                    selectedDays.isEmpty() -> RepeatMode.OneTime
-                    selectedDays == RepeatMode.Weekdays.days -> RepeatMode.Weekdays
-                    selectedDays == RepeatMode.Weekends.days -> RepeatMode.Weekends
-                    selectedDays == RepeatMode.EveryDay.days -> RepeatMode.EveryDay
-                    else -> RepeatMode.Custom(selectedDays)
-                }
-                onConfirm(repeat)
-                onDismiss()
-            }) {
-                Text(
-                    "Done",
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp), textAlign = TextAlign.Center
-                )
+
             }
         }
     }
@@ -272,7 +288,6 @@ private fun RepeatPickerDialog(
 @Composable
 private fun MissionsCard(
     mission: Mission?,
-    onNewMissions: (missions: List<Mission>) -> Unit,
     addMission: () -> Unit
 ) {
     Card(
@@ -323,7 +338,7 @@ private fun MissionsCard(
 }
 
 @Composable
-private fun SoundCard(sound: String, showSoundPicker: () -> Unit) {
+private fun SoundCard(sound: String) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp)) {
             Text(text = "Sound", style = MaterialTheme.typography.titleMedium)
@@ -343,7 +358,7 @@ fun TimePickerViewDialog(
 ) {
     val context = LocalContext.current
     // Alarm.hour is 0–23; 12-hour picker reports 0–11 without AM/PM in this callback.
-    val timePicker = TimePickerDialog(context, { tp, selectedHour: Int, selectedMinute: Int ->
+    val timePicker = TimePickerDialog(context, { _, selectedHour: Int, selectedMinute: Int ->
         onConfirm(selectedHour, selectedMinute)
     }, initialHour, initialMinute, true)
     DisposableEffect(true) {
@@ -389,13 +404,13 @@ fun RepeatDialogPreview() {
 @Preview(device = "id:pixel_5")
 @Composable
 fun MissionsCardPreview() {
-    MissionsCard(mission = MathMission(), {}, {})
+    MissionsCard(mission = MathMission()) {}
 }
 
 @Preview
 @Composable
 fun SoundCardPreview() {
     WTFUTheme {
-        SoundCard(sound = "random", showSoundPicker = {})
+        SoundCard(sound = "random")
     }
 }
