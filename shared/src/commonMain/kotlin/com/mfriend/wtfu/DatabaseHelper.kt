@@ -30,7 +30,7 @@ class DatabaseHelper(driver: SqlDriver) {
 
     suspend fun insertAlam(alarm: Alarm): Alarm {
         return withContext(Dispatchers.IO) {
-            alarmQueries.insert(alarm.id, alarm.hour, alarm.minute, alarm.enabled, alarm.sound)
+            alarmQueries.insert(alarm.id, alarm.hour, alarm.minute, alarm.enabled, alarm.sound).value
             val resolvedId = alarm.id ?: alarmQueries.lastInsertRowId().executeAsOne().toInt()
             alarm.copy(id = resolvedId)
         }

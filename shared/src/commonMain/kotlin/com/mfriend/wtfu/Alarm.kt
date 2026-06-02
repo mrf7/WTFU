@@ -36,7 +36,7 @@ sealed interface RepeatMode {
     )
 
     object Weekends : Custom(setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
-    object EveryDay : Custom(DayOfWeek.values().toSet())
+    object EveryDay : Custom(DayOfWeek.entries.toSet())
     open class Custom(val days: Set<DayOfWeek>) : RepeatMode
 }
 

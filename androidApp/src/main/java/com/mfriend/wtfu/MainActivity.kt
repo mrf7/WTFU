@@ -93,7 +93,6 @@ fun AlarmApp(
                     entry<AlarmTrigger> { key ->
                         AlarmTriggerScreen(
                             alarmId = key.id,
-                            viewModel = viewModel,
                             onDismiss = { backStack.removeLastOrNull() },
                         )
                     }

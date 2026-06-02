@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,7 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mfriend.wtfu.Alarm
-import com.mfriend.wtfu.AlarmViewModel
+import com.mfriend.wtfu.AlarmTriggerViewModel
+import com.mfriend.wtfu.MathMission
+import com.mfriend.wtfu.Mission
 import com.mfriend.wtfu.WTFUTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Clock
@@ -55,44 +56,48 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import org.koin.androidx.compose.koinViewModel
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmViewModel, onDismiss: () -> Unit) {
+fun AlarmTriggerScreen(alarmId: Int, viewModel: AlarmTriggerViewModel = koinViewModel(), onDismiss: () -> Unit) {
     val alarm by viewModel.getAlarm(alarmId).collectAsState(null)
-    AlarmScreenInner(alarm, alarmId, viewModel, onDismiss)
+    alarm?.let {
+        AlarmScreenInner(it.copy(missions = MathMission())) {
+            viewModel.stopRinging(alarmId)
+            onDismiss()
+        }
+    }
+
 }
 
 @Composable
 private fun AlarmScreenInner(
-    alarm: Alarm?,
-    alarmId: Int,
-    viewModel: AlarmViewModel,
+    alarm: Alarm,
     onDismiss: () -> Unit,
 ) {
-    var dismiss by remember { mutableStateOf(false) }
-    if (dismiss) {
-        AlarmDismiss(alarm, alarmId, viewModel, onDismiss)
+    var showMission by remember { mutableStateOf(false) }
+    if (alarm.missions == null) {
+        AlarmTrigger(onDismiss)
+    } else if (showMission) {
+        // TODO figure out why smartcast doesnt work here. Some weird compose stuff prob
+        AlarmMission(alarm.missions!!, onDismiss)
     } else {
-        AlarmTrigger { dismiss = true }
+        AlarmTrigger {
+            showMission = true
+        }
     }
 }
 
-// TODO Pull data from actual alarm object and make alarm non nullable
 @Composable
-private fun AlarmDismiss(
-    alarm: Alarm?,
-    alarmId: Int,
-    viewModel: AlarmViewModel,
+private fun AlarmMission(
+    missions: Mission,
     onDismiss: () -> Unit,
 ) {
-    MathMissionScreen(
-        onDismiss = {
-            viewModel.stopRinging(alarmId)
-            onDismiss()
-        },
-    )
+    when (missions) {
+        is MathMission -> MathMissionScreen(onDismiss = onDismiss)
+    }
 }
 
 @Composable
@@ -105,7 +110,11 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
 
     fun checkAnswer() = answerText.toIntOrNull() == numbers.first + numbers.second
     Column(modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxWidth().weight(0.5f), verticalArrangement = Arrangement.Center) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .weight(0.5f), verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 "${numbers.first} + ${numbers.second} = ",
                 Modifier.align(Alignment.CenterHorizontally),
@@ -123,7 +132,9 @@ private fun MathMissionScreen(modifier: Modifier = Modifier, onDismiss: () -> Un
             )
         }
         NumberEntry(
-            Modifier.fillMaxWidth().weight(0.5f),
+            Modifier
+                .fillMaxWidth()
+                .weight(0.5f),
             answerText,
             onValueChange = { answerText = it },
             onSubmit = { if (checkAnswer()) onDismiss() }
@@ -141,7 +152,11 @@ private fun NumberEntry(
 ) {
     Column(modifier) {
         (9 downTo 1).chunked(3).forEach { rowNums ->
-            Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f), horizontalArrangement = Arrangement.Center
+            ) {
                 rowNums.reversed().forEach {
                     Button(
                         onClick = { onValueChange(value + it.toString()) },
@@ -156,7 +171,11 @@ private fun NumberEntry(
                 }
             }
         }
-        Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.Center) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .weight(1f), horizontalArrangement = Arrangement.Center
+        ) {
             Button(
                 onClick = { onValueChange(value.dropLast(1)) },
                 Modifier
@@ -200,7 +219,11 @@ private fun AlarmTrigger(onDismiss: () -> Unit) {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DateTimeHeader(Modifier.padding(vertical = 20.dp).weight(1f))
+        DateTimeHeader(
+            Modifier
+                .padding(vertical = 20.dp)
+                .weight(1f)
+        )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Button(
                 onClick = { /*TODO #16 Implement snooze */ },

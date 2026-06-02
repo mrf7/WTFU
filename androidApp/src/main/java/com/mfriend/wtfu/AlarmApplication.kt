@@ -17,6 +17,7 @@ class AlarmApplication : Application() {
         initKoin(
             module {
                 viewModelOf(::AlarmViewModel)
+                viewModelOf(::AlarmTriggerViewModel)
                 single<Context> { this@AlarmApplication }
                 single<AlarmManager> { get<Context>().getSystemService(ALARM_SERVICE) as AlarmManager }
                 single<AlarmScheduler> { AndroidAlarmScheduler(get(), get()) }

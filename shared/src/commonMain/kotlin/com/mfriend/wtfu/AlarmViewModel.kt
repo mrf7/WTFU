@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 class AlarmViewModel(
     private val database: DatabaseHelper,
     private val alarmScheduler: AlarmScheduler,
-    private val alarmRinger: AlarmRinger,
 ) : ViewModel() {
     val alarmsFlow = database.getAlarms().map { alarms ->
         alarms.map {
@@ -53,7 +52,4 @@ class AlarmViewModel(
         }
     }
 
-    fun stopRinging(alarmId: Int) {
-        alarmRinger.stop(alarmId)
-    }
 }
