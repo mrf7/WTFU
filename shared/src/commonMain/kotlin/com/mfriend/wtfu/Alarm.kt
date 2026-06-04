@@ -38,6 +38,15 @@ sealed interface RepeatMode {
     object Weekends : Custom(setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
     object EveryDay : Custom(DayOfWeek.entries.toSet())
     open class Custom(val days: Set<DayOfWeek>) : RepeatMode
+    companion object {
+        fun fromDays(selectedDays: Set<DayOfWeek>) = when {
+            selectedDays.isEmpty() -> OneTime
+            selectedDays == Weekdays.days -> Weekdays
+            selectedDays == Weekends.days -> Weekends
+            selectedDays == EveryDay.days -> EveryDay
+            else -> Custom(selectedDays)
+        }
+    }
 }
 
 fun RepeatMode.localizeString(): String {

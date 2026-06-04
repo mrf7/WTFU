@@ -1,6 +1,5 @@
 package com.mfriend.wtfu
 
-import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,11 +22,9 @@ import com.mfriend.wtfu.navigation.AlarmTrigger
 import com.mfriend.wtfu.navigation.resolveDeepLinkForExistingTask
 import com.mfriend.wtfu.navigation.resolveStartKeys
 import com.mfriend.wtfu.ui.alarm.AlarmTriggerScreen
-import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
-    private val notificationManager: NotificationManager by inject()
     private val pendingDeepLink = mutableStateOf<NavKey?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +78,7 @@ fun AlarmApp(
                             alarms = alarms,
                             newAlarm = { backStack.add(AlarmEdit()) },
                             onAlarmClicked = { backStack.add(AlarmEdit(id = it.id)) },
+                            onCheckedChanged = { alarm, enabled -> viewModel.enableAlarm(alarm, enabled) }
                         )
                     }
                     entry<AlarmEdit> { key ->

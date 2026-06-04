@@ -27,9 +27,13 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 
 @Composable
-fun AlarmListScreen(alarms: List<Alarm>, onAlarmClicked: (Alarm) -> Unit, newAlarm: () -> Unit) {
+fun AlarmListScreen(
+    alarms: List<Alarm>,
+    onAlarmClicked: (Alarm) -> Unit,
+    newAlarm: () -> Unit,
+    onCheckedChanged: (Alarm, Boolean) -> Unit
+) {
     Scaffold(
-
         floatingActionButton = {
             FloatingActionButton(onClick = { newAlarm() }, shape = CircleShape) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Alarm")
@@ -37,13 +41,14 @@ fun AlarmListScreen(alarms: List<Alarm>, onAlarmClicked: (Alarm) -> Unit, newAla
         }
     ) { padding ->
         LazyColumn(Modifier.padding(padding)) {
-            items(alarms) {
+            items(alarms) { alarm ->
                 AlarmCard(
-                    alarm = it,
+                    alarm = alarm,
+                    onCheckedChanged = { onCheckedChanged(alarm, it) },
                     Modifier
                         .padding(horizontal = 5.dp, vertical = 5.dp)
                         .fillMaxWidth()
-                        .clickable { onAlarmClicked(it) }
+                        .clickable { onAlarmClicked(alarm) }
                 )
             }
         }
@@ -52,7 +57,7 @@ fun AlarmListScreen(alarms: List<Alarm>, onAlarmClicked: (Alarm) -> Unit, newAla
 
 // TODO colors are weird af
 @Composable
-fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
+fun AlarmCard(alarm: Alarm, onCheckedChanged: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     Card(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.padding(10.dp)) {
@@ -61,7 +66,11 @@ fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
                 Text(alarm.toTimeString(), style = MaterialTheme.typography.headlineLarge)
             }
             Spacer(Modifier.weight(1f))
-            Switch(checked = alarm.enabled, onCheckedChange = {}, modifier = Modifier.padding(end = 10.dp))
+            Switch(
+                checked = alarm.enabled,
+                onCheckedChange = onCheckedChanged,
+                modifier = Modifier.padding(end = 10.dp)
+            )
         }
     }
 }
@@ -81,7 +90,7 @@ fun AlarmListPreview() {
     WTFUTheme {
         AlarmListScreen(
             alarms = sampleAlarms,
-            {}, {}
+            {}, {}, { _, _ -> }
         )
     }
 }

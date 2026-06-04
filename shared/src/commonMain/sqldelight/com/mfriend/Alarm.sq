@@ -1,3 +1,5 @@
+import com.mfriend.wtfu.Mission;
+import com.mfriend.wtfu.RepeatMode;
 import kotlin.Boolean;
 import kotlin.Int;
 
@@ -6,14 +8,16 @@ CREATE TABLE AlarmDbo(
     hour INTEGER AS Int NOT NULL,
     minute INTEGER AS Int NOT NULL,
     enabled INTEGER AS Boolean NOT NULL,
-    sound TEXT NOT NULL
+    sound TEXT NOT NULL,
+    repeat TEXT AS RepeatMode NOT NULL,
+    missions TEXT AS Mission
 );
 
 selectAll:
 SELECT * FROM AlarmDbo;
 
 insert:
-REPLACE INTO AlarmDbo (id, hour, minute, enabled, sound) VALUES (?, ?, ?, ?, ?);
+REPLACE INTO AlarmDbo (id, hour, minute, enabled, sound, repeat, missions) VALUES (?, ?, ?, ?, ?, ?,?) RETURNING *;
 
 selectById:
 SELECT * FROM AlarmDbo WHERE id = ?;
@@ -23,6 +27,3 @@ DELETE FROM AlarmDbo WHERE id = ?;
 
 deleteAll:
 DELETE FROM AlarmDbo;
-
-lastInsertRowId:
-SELECT last_insert_rowid();

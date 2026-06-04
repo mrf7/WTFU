@@ -261,13 +261,7 @@ private fun RepeatPickerDialog(
                 Button(onClick = {
                     val selectedDays =
                         DayOfWeek.entries.filterIndexed { index, _ -> selected[index] }.toSet()
-                    val repeat = when {
-                        selectedDays.isEmpty() -> RepeatMode.OneTime
-                        selectedDays == RepeatMode.Weekdays.days -> RepeatMode.Weekdays
-                        selectedDays == RepeatMode.Weekends.days -> RepeatMode.Weekends
-                        selectedDays == RepeatMode.EveryDay.days -> RepeatMode.EveryDay
-                        else -> RepeatMode.Custom(selectedDays)
-                    }
+                    val repeat = RepeatMode.fromDays(selectedDays)
                     onConfirm(repeat)
                     onDismiss()
                 }) {
